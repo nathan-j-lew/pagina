@@ -10,6 +10,7 @@ import {
 } from "motion/react";
 import {
   Fragment,
+  use,
   useContext,
   useEffect,
   useMemo,
@@ -18,46 +19,57 @@ import {
 } from "react";
 import { trunc } from "@/lib/utils";
 import { MousePositionContext } from "@/context/MousePosition/MousePosition";
+import { useLenis } from "lenis/react";
 
 export const ScrollIndicator = ({
   scrollYProgress,
 }: {
   scrollYProgress: MotionValue;
 }) => {
+  const lenis = useLenis((lenis) => {
+    // called every scroll
+    console.log(lenis);
+  });
   const mousePosition = useContext(MousePositionContext);
 
   const [dialPos, setDialPos] = useState({ x: 0, y: 0 });
   const [dialRadius, setDialRadius] = useState(0);
 
   const [newAngle, setNewAngle] = useState(0);
+
   const newAngleMotion = useSpring(newAngle, {
     stiffness: 100,
     damping: 10,
   });
 
-  const [scope, animate] = useAnimate();
-  const scale = useMotionValue(1);
-  const y = useMotionValue("0%");
+  const ref = useRef<SVGSVGElement>(null);
+  const scale = useSpring(1, {
+    stiffness: 100,
+    damping: 15,
+  });
+  const y = useSpring("0%", {
+    stiffness: 100,
+    damping: 15,
+  });
 
   const pathLength = useTransform(scrollYProgress, [0, 1], [0, 1.01]);
 
   const updateDialInfo = () => {
-    if (scope.current) {
+    if (ref.current) {
       setDialPos({
         x:
-          scope.current.getBoundingClientRect().left +
-          (scale.get() * scope.current.clientWidth) / 2,
+          ref.current.getBoundingClientRect().left +
+          (scale.get() * ref.current.clientWidth) / 2,
         y:
-          scope.current.getBoundingClientRect().top +
-          (scale.get() * scope.current.clientHeight) / 2,
+          ref.current.getBoundingClientRect().top +
+          (scale.get() * ref.current.clientHeight) / 2,
       });
-      setDialRadius(scale.get() * scope.current.clientWidth);
+      setDialRadius(scale.get() * ref.current.clientWidth);
     }
   };
   useEffect(() => {
-    console.log(scope.current);
     updateDialInfo();
-  }, [scope.current]);
+  }, [ref.current]);
 
   useMotionValueEvent(scale, "change", () => {
     updateDialInfo();
@@ -129,13 +141,24 @@ export const ScrollIndicator = ({
 
   useEffect(() => {
     if (mousePosition.clicked.x !== null && mousePosition.clicked.y !== null) {
-      setNewAngle((old) => trunc(old + dot.angle * (dot.det < 0 ? 1 : -1)));
+      if (Math.abs(newAngle) <= 10) {
+        setNewAngle((old) => trunc(old + dot.angle * (dot.det < 0 ? 1 : -1)));
+      }
     }
   }, [dot]);
 
   useEffect(() => {
+    if (Math.abs(newAngle) > 10) {
+      setNewAngle(Math.sign(newAngle) * 10);
+    }
     newAngleMotion.set(newAngle / 10);
   }, [newAngle]);
+
+  useMotionValueEvent(newAngleMotion, "change", (latest) => {
+    lenis?.scrollTo(
+      (lenis.dimensions.scrollHeight - lenis.dimensions.height) * latest
+    );
+  });
 
   const absNewAngleMotion = useTransform(newAngleMotion, (v) => Math.abs(v));
   const signNewAngleMotion = useTransform(newAngleMotion, (v) =>
@@ -206,20 +229,14 @@ export const ScrollIndicator = ({
             y,
           }}
           onHoverStart={() => {
-            animate(
-              scope.current,
-              { scale: 4, y: "-150%" },
-              { duration: 0.1, ease: "easeOut" }
-            );
+            scale.set(4);
+            y.set("-150%");
           }}
           onHoverEnd={() => {
-            animate(
-              scope.current,
-              { scale: 1, y: "0%" },
-              { duration: 0.1, ease: "easeOut" }
-            );
+            scale.set(1);
+            y.set("0%");
           }}
-          ref={scope}
+          ref={ref}
         >
           <motion.circle
             cx="32"
