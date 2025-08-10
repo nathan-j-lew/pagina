@@ -1,8 +1,6 @@
 import {
-  // animate,
   motion,
   MotionValue,
-  useAnimate,
   useMotionValue,
   useMotionValueEvent,
   useSpring,
@@ -10,6 +8,7 @@ import {
 } from "motion/react";
 import {
   Fragment,
+  memo,
   use,
   useContext,
   useEffect,
@@ -20,6 +19,7 @@ import {
 import { trunc } from "@/lib/utils";
 import { MousePositionContext } from "@/context/MousePosition/MousePosition";
 import { useLenis } from "lenis/react";
+import path from "path";
 
 export const ScrollIndicator = ({
   scrollYProgress,
@@ -27,22 +27,27 @@ export const ScrollIndicator = ({
   scrollYProgress: MotionValue;
 }) => {
   const lenis = useLenis((lenis) => {
-    // called every scroll
-    console.log(lenis);
+    if (mousePosition.clicked.x != null) return;
+    if (mousePosition.clicked.y != null) return;
+    // setNewAngle(
+    //   lenis.scroll / (lenis.dimensions.scrollHeight - lenis.dimensions.height)
+    // );
   });
   const mousePosition = useContext(MousePositionContext);
 
-  const [dialPos, setDialPos] = useState({ x: 0, y: 0 });
-  const [dialRadius, setDialRadius] = useState(0);
+  const [dial, setDial] = useState({ x: 0, y: 0, radius: 0 });
 
   const [newAngle, setNewAngle] = useState(0);
 
-  const newAngleMotion = useSpring(newAngle, {
+  const scrollYProgressSpring = useSpring(scrollYProgress, {
     stiffness: 100,
     damping: 10,
   });
 
+  const newAngleMotion = useMotionValue(newAngle);
+
   const ref = useRef<SVGSVGElement>(null);
+
   const scale = useSpring(1, {
     stiffness: 100,
     damping: 15,
@@ -52,19 +57,28 @@ export const ScrollIndicator = ({
     damping: 15,
   });
 
-  const pathLength = useTransform(scrollYProgress, [0, 1], [0, 1.01]);
+  const pathLength = useTransform(scrollYProgress, [0, 1], [0, 1.006]);
+  useMotionValueEvent(scrollYProgress, "change", (latest) => {
+    console.log("scrollYProgress", latest);
+  });
+
+  const circumference = 2 * Math.PI * 16;
+  const strokeDashoffset = useTransform(
+    scrollYProgress,
+    (value) => circumference * (1 - value)
+  );
 
   const updateDialInfo = () => {
     if (ref.current) {
-      setDialPos({
+      setDial({
         x:
           ref.current.getBoundingClientRect().left +
           (scale.get() * ref.current.clientWidth) / 2,
         y:
           ref.current.getBoundingClientRect().top +
           (scale.get() * ref.current.clientHeight) / 2,
+        radius: (ref.current.clientWidth / 2) * scale.get(),
       });
-      setDialRadius(scale.get() * ref.current.clientWidth);
     }
   };
   useEffect(() => {
@@ -78,19 +92,12 @@ export const ScrollIndicator = ({
     updateDialInfo();
   });
 
-  useEffect(() => {
-    window.addEventListener("resize", updateDialInfo);
-    return () => {
-      window.removeEventListener("resize", updateDialInfo);
-    };
-  });
-
   const trackedMousePosition = useMemo(() => {
     return {
-      x: trunc((mousePosition.position.x ?? 0) - dialPos.x),
-      y: trunc((mousePosition.position.y ?? 0) - dialPos.y),
+      x: trunc((mousePosition.position.x ?? 0) - dial.x),
+      y: trunc((mousePosition.position.y ?? 0) - dial.y),
     };
-  }, [mousePosition.position, mousePosition.clicked, dialPos]);
+  }, [mousePosition.position, mousePosition.clicked, dial]);
 
   const prevMousePosition = useRef<{
     x: number;
@@ -104,11 +111,11 @@ export const ScrollIndicator = ({
   const dot = useMemo(() => {
     const vec1 = {
       x: prevMousePosition.current.x,
-      y: -prevMousePosition.current.y,
+      y: prevMousePosition.current.y,
     };
     const vec2 = {
       x: trackedMousePosition.x,
-      y: -trackedMousePosition.y,
+      y: trackedMousePosition.y,
     };
 
     const len1 = Math.hypot(vec1.x, vec1.y);
@@ -130,7 +137,7 @@ export const ScrollIndicator = ({
       Math.hypot(norm1.x, norm1.y) * Math.hypot(norm2.x, norm2.y)
     );
     const dotProduct = trunc(numerator / denominator);
-    console.log(Math.hypot(vec1.x, vec1.y), Math.hypot(vec2.x, vec2.y));
+
     let theta = trunc(Math.acos(dotProduct));
     const det = trunc(norm1.x * norm2.y - norm1.y * norm2.x);
     return {
@@ -141,92 +148,42 @@ export const ScrollIndicator = ({
 
   useEffect(() => {
     if (mousePosition.clicked.x !== null && mousePosition.clicked.y !== null) {
-      if (Math.abs(newAngle) <= 10) {
-        setNewAngle((old) => trunc(old + dot.angle * (dot.det < 0 ? 1 : -1)));
-      }
+      //   if (Math.abs(newAngle) <= 10) {
+      // setNewAngle((old) => trunc(old + dot.angle * (dot.det > 0 ? 1 : -1)));
+      const test = trunc(
+        scrollYProgress.get() + dot.angle * (dot.det > 0 ? 1 : -1)
+      );
+      lenis?.scrollTo(
+        (lenis.dimensions.scrollHeight - lenis.dimensions.height) * test
+      );
+      //   }
     }
   }, [dot]);
 
   useEffect(() => {
     if (Math.abs(newAngle) > 10) {
       setNewAngle(Math.sign(newAngle) * 10);
+    } else if (newAngle < 0) {
+      setNewAngle(0);
     }
     newAngleMotion.set(newAngle / 10);
   }, [newAngle]);
 
-  useMotionValueEvent(newAngleMotion, "change", (latest) => {
-    lenis?.scrollTo(
-      (lenis.dimensions.scrollHeight - lenis.dimensions.height) * latest
-    );
-  });
-
-  const absNewAngleMotion = useTransform(newAngleMotion, (v) => Math.abs(v));
-  const signNewAngleMotion = useTransform(newAngleMotion, (v) =>
-    v < 0 ? -1 : 1
-  );
-
   return (
     <Fragment>
-      <div className="fixed top-0 left-0 p-4">
-        <div>{`${mousePosition.position.x}, ${mousePosition.position.y}`}</div>
-        <div>{`${prevMousePosition.current.x}, ${prevMousePosition.current.y}`}</div>
-        <div>{`${trackedMousePosition.x}, ${trackedMousePosition.y}`}</div>
-      </div>
-      <div className="fixed top-0 right-0 p-4">
-        {/* <p>Dial position: {`${dialPos.x}, ${dialPos.y}`}</p> */}
-        <p>Dial radius: {`${dialRadius}`}</p>
-        <p>{`${mousePosition.clicked.x}, ${mousePosition.clicked.y}`}</p>
-        <p>
-          D:{" "}
-          {mousePosition.clicked.x !== null &&
-            mousePosition.position.x - mousePosition.clicked.x}
-          ,{" "}
-          {mousePosition.clicked.y !== null &&
-            mousePosition.position.y - mousePosition.clicked.y}
-        </p>
-        <p>
-          R1:{" "}
-          {mousePosition.clicked.x !== null &&
-            mousePosition.clicked.x - dialPos.x}
-          ,{" "}
-          {mousePosition.clicked.y !== null &&
-            mousePosition.clicked.y - dialPos.y}
-          ,{" "}
-          {mousePosition.clicked.x !== null &&
-            mousePosition.clicked.y !== null &&
-            Math.hypot(
-              mousePosition.clicked.x - dialPos.x,
-              mousePosition.clicked.y - dialPos.y
-            )}
-        </p>
-        <p>
-          R2:{" "}
-          {mousePosition.clicked.x !== null &&
-            mousePosition.position.x - dialPos.x}
-          ,{" "}
-          {mousePosition.clicked.y !== null &&
-            mousePosition.position.y - dialPos.y}
-          ,{" "}
-          {mousePosition.clicked.x !== null &&
-            mousePosition.clicked.y !== null &&
-            Math.hypot(
-              mousePosition.position.x - dialPos.x,
-              mousePosition.position.y - dialPos.y
-            )}
-        </p>
-        {/* <p>Dots: {dot.dot}</p> */}
-        <p>Angles: {dot.angle}</p>
-        <p>Determinant: {dot.det}</p>
-        <p>{newAngle}</p>
+      <div className="fixed top-0 inset-x-0 flex justify-center mb-4">
+        {/* {newAngle} */}
+        {/* {dial.x} {dial.y} {dial.radius} */}
       </div>
       <div className="fixed bottom-0 inset-x-0 flex justify-center mb-4">
         <motion.svg
-          className="size-12"
+          className="size-18"
           viewBox={"0 0 64 64"}
           id="scroll-bounds"
           style={{
             scale,
             y,
+            // touchAction: "none",
           }}
           onHoverStart={() => {
             scale.set(4);
@@ -246,38 +203,31 @@ export const ScrollIndicator = ({
               fill: "var(--foreground)",
               opacity: 0.1,
             }}
+            // onPointerDownCapture={(e) => e.stopPropagation()}
           />
           <motion.circle
+            key={"scroll-path"}
             cx="32"
             cy="32"
             r="16"
             style={{
-              pathLength: pathLength,
+              //   pathLength: scrollYProgress,
               fill: "none",
               stroke: "var(--foreground)",
               strokeWidth: 32,
+              strokeDasharray: circumference,
+              strokeDashoffset: strokeDashoffset,
             }}
           />
-          <motion.circle
-            cx="32"
-            cy="32"
-            r="30"
-            style={{
-              pathLength: absNewAngleMotion,
-              scaleY: signNewAngleMotion,
-              fill: "none",
-              stroke: "red",
-              strokeWidth: 4,
-            }}
-          />
-          <motion.circle
+
+          {/* <motion.circle
             cx="32"
             cy="32"
             r="2"
             style={{
               fill: "blue",
             }}
-          />
+          /> */}
         </motion.svg>
       </div>
     </Fragment>

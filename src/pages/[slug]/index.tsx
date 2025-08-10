@@ -26,7 +26,7 @@ export default function Page({
     <div className={`${libreBodoni.className} font-sans`}>
       <motion.main className="flex flex-col items-center relative h-[500lvh]">
         <motion.div
-          className="fixed inset-x-0 h-svh -z-1"
+          className="fixed inset-0 -z-1"
           layout
           layoutScroll
           layoutId="background"
@@ -39,9 +39,9 @@ export default function Page({
           layoutId="title"
           layout="position"
         >
-          <motion.h2 className="text-xl font-bold text-center text-foreground">
+          {/* <motion.h2 className="text-xl font-bold text-center text-foreground">
             {spreadData.title}
-          </motion.h2>
+          </motion.h2> */}
         </motion.div>
         <motion.div
           initial={{ opacity: 0 }}

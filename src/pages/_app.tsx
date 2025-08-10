@@ -41,10 +41,7 @@ export default function App({ Component, pageProps }: AppProps) {
     };
   }, []);
 
-  const lenis = useLenis((lenis) => {
-    // called every scroll
-    console.log(lenis);
-  });
+  const lenis = useLenis((lenis) => {});
 
   return (
     <Fragment>
