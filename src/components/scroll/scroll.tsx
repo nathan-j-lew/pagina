@@ -29,9 +29,6 @@ export const ScrollIndicator = ({
   const lenis = useLenis((lenis) => {
     if (mousePosition.clicked.x != null) return;
     if (mousePosition.clicked.y != null) return;
-    // setNewAngle(
-    //   lenis.scroll / (lenis.dimensions.scrollHeight - lenis.dimensions.height)
-    // );
   });
   const mousePosition = useContext(MousePositionContext);
 
@@ -63,10 +60,18 @@ export const ScrollIndicator = ({
   });
 
   const circumference = 2 * Math.PI * 16;
+
+  const clampedScrollYProgress = useTransform(scrollYProgress, [0, 1], [0, 1], {
+    clamp: true,
+  });
   const strokeDashoffset = useTransform(
-    scrollYProgress,
+    clampedScrollYProgress,
     (value) => circumference * (1 - value)
   );
+  const testOffset = useSpring(strokeDashoffset, {
+    stiffness: 100,
+    damping: 25,
+  });
 
   const updateDialInfo = () => {
     if (ref.current) {
@@ -183,6 +188,7 @@ export const ScrollIndicator = ({
           style={{
             scale,
             y,
+            cursor: "pointer",
             // touchAction: "none",
           }}
           onHoverStart={() => {
@@ -216,7 +222,7 @@ export const ScrollIndicator = ({
               stroke: "var(--foreground)",
               strokeWidth: 32,
               strokeDasharray: circumference,
-              strokeDashoffset: strokeDashoffset,
+              strokeDashoffset: testOffset,
             }}
           />
 
