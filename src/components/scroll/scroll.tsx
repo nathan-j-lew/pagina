@@ -19,7 +19,6 @@ import {
 import { trunc } from "@/lib/utils";
 import { MousePositionContext } from "@/context/MousePosition/MousePosition";
 import { useLenis } from "lenis/react";
-import path from "path";
 
 export const ScrollIndicator = ({
   scrollYProgress,
@@ -34,27 +33,17 @@ export const ScrollIndicator = ({
 
   const [dial, setDial] = useState({ x: 0, y: 0, radius: 0 });
 
-  const [newAngle, setNewAngle] = useState(0);
-
-  const scrollYProgressSpring = useSpring(scrollYProgress, {
-    stiffness: 100,
-    damping: 10,
-  });
-
-  const newAngleMotion = useMotionValue(newAngle);
-
   const ref = useRef<SVGSVGElement>(null);
 
   const scale = useSpring(1, {
-    stiffness: 100,
+    stiffness: 150,
     damping: 15,
   });
   const y = useSpring("0%", {
-    stiffness: 100,
+    stiffness: 150,
     damping: 15,
   });
 
-  const pathLength = useTransform(scrollYProgress, [0, 1], [0, 1.006]);
   useMotionValueEvent(scrollYProgress, "change", (latest) => {
     console.log("scrollYProgress", latest);
   });
@@ -155,24 +144,18 @@ export const ScrollIndicator = ({
     if (mousePosition.clicked.x !== null && mousePosition.clicked.y !== null) {
       //   if (Math.abs(newAngle) <= 10) {
       // setNewAngle((old) => trunc(old + dot.angle * (dot.det > 0 ? 1 : -1)));
-      const test = trunc(
-        scrollYProgress.get() + dot.angle * (dot.det > 0 ? 1 : -1)
-      );
-      lenis?.scrollTo(
-        (lenis.dimensions.scrollHeight - lenis.dimensions.height) * test
-      );
+      const dist = Math.hypot(trackedMousePosition.x, trackedMousePosition.y);
+      if (dist < dial.radius) {
+        const test = trunc(
+          scrollYProgress.get() + dot.angle * (dot.det > 0 ? 1 : -1)
+        );
+        lenis?.scrollTo(
+          (lenis.dimensions.scrollHeight - lenis.dimensions.height) * test
+        );
+      }
       //   }
     }
   }, [dot]);
-
-  useEffect(() => {
-    if (Math.abs(newAngle) > 10) {
-      setNewAngle(Math.sign(newAngle) * 10);
-    } else if (newAngle < 0) {
-      setNewAngle(0);
-    }
-    newAngleMotion.set(newAngle / 10);
-  }, [newAngle]);
 
   return (
     <Fragment>
@@ -189,7 +172,7 @@ export const ScrollIndicator = ({
             scale,
             y,
             cursor: "pointer",
-            // touchAction: "none",
+            touchAction: "none",
           }}
           onHoverStart={() => {
             scale.set(4);
