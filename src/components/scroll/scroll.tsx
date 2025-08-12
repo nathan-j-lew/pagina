@@ -120,21 +120,8 @@ export const ScrollIndicator = ({
       y: trackedMousePosition.y,
     };
 
-    const touchVec1 = {
-      x: mousePosition.taps[0].x ? mousePosition.taps[0].x - dial.x : 0,
-      y: mousePosition.taps[0].y ? mousePosition.taps[0].y - dial.y : 0,
-    };
-
-    const touchVec2 = {
-      x: mousePosition.taps[1].x ? mousePosition.taps[1].x - dial.x : 0,
-      y: mousePosition.taps[1].y ? mousePosition.taps[1].y - dial.y : 0,
-    };
-
     const len1 = Math.hypot(vec1.x, vec1.y);
     const len2 = Math.hypot(vec2.x, vec2.y);
-
-    const lenTouch1 = Math.hypot(touchVec1.x, touchVec1.y);
-    const lenTouch2 = Math.hypot(touchVec2.x, touchVec2.y);
 
     const norm1 = {
       x: vec1.x / len1,
@@ -146,41 +133,22 @@ export const ScrollIndicator = ({
       y: vec2.y / len2,
     };
 
-    const normTouch1 = {
-      x: touchVec1.x / lenTouch1 || 0,
-      y: touchVec1.y / lenTouch1 || 0,
-    };
-
-    const normTouch2 = {
-      x: touchVec2.x / lenTouch2 || 0,
-      y: touchVec2.y / lenTouch2 || 0,
-    };
-
     const numerator = trunc(norm1.x * norm2.x + norm1.y * norm2.y);
-    const numeratorTouch = trunc(
-      normTouch1.x * normTouch2.x + normTouch1.y * normTouch2.y
-    );
+
     const denominator = trunc(
       Math.hypot(norm1.x, norm1.y) * Math.hypot(norm2.x, norm2.y)
     );
-    const denominatorTouch = trunc(
-      Math.hypot(normTouch1.x, normTouch1.y) *
-        Math.hypot(normTouch2.x, normTouch2.y)
-    );
-    const dotProduct = trunc(numerator / denominator);
-    const dotProductTouch = trunc(numeratorTouch / denominatorTouch);
 
-    let theta = trunc(Math.acos(dotProduct));
-    let thetaTouch = trunc(Math.acos(dotProductTouch));
+    const dotProduct = trunc(numerator / denominator);
+
+    const theta = trunc(Math.acos(dotProduct));
+
     const det = trunc(norm1.x * norm2.y - norm1.y * norm2.x);
-    const detTouch = trunc(
-      normTouch1.x * normTouch2.y - normTouch1.y * normTouch2.x
-    );
+
     return {
       angle: theta,
-      angleTouch: thetaTouch,
+
       det: det,
-      detTouch: detTouch,
     };
   }, [trackedMousePosition, prevMousePosition.current, mousePosition.taps]);
 
