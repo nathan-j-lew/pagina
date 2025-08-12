@@ -1,7 +1,12 @@
 import Image from "next/image";
 import { Libre_Bodoni } from "next/font/google";
 import ChevronLeft from "@/assets/icons/chevron-left.svg";
-import { motion, useMotionValueEvent, useScroll } from "motion/react";
+import {
+  motion,
+  useMotionValueEvent,
+  useScroll,
+  useTransform,
+} from "motion/react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { getSpreadData, getSpreadSlugs } from "@/lib/spreads";
@@ -22,6 +27,11 @@ export default function Page({
   };
 }) {
   const { scrollYProgress } = useScroll();
+  const mix = useTransform(
+    scrollYProgress,
+    [0, 1],
+    [spreadData.hex, "#888888"]
+  );
   return (
     <div className={`${libreBodoni.className} font-sans`}>
       <motion.main className="flex flex-col items-center relative h-[500lvh]">
@@ -31,7 +41,7 @@ export default function Page({
           layoutScroll
           layoutId="background"
           style={{
-            backgroundColor: spreadData.hex,
+            backgroundColor: mix,
           }}
         />
         <motion.div

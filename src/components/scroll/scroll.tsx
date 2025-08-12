@@ -190,7 +190,14 @@ export const ScrollIndicator = ({
       mousePosition.taps[0].x !== null
     ) {
       const dist = Math.hypot(trackedMousePosition.x, trackedMousePosition.y);
-      if (dist < dial.radius) {
+      const distInit = Math.hypot(
+        mousePosition.clicked.x ?? 999,
+        mousePosition.clicked.y ?? 999
+      );
+      if (
+        dist < dial.radius ||
+        (mousePosition.taps[0].x !== null && distInit < dial.radius)
+      ) {
         const test = trunc(
           scrollYProgress.get() +
             dot.angle *
@@ -201,8 +208,6 @@ export const ScrollIndicator = ({
           (lenis.dimensions.scrollHeight - lenis.dimensions.height) * test,
           {
             immediate: true,
-            // duration: 0.5,
-            // easing: (t) => t * (2 - t), // easeInOut
           }
         );
       }
