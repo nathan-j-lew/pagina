@@ -11,19 +11,36 @@ export default function App({ Component, pageProps }: AppProps) {
     y: number | null;
   }>({ x: null, y: null });
   const [taps, setTaps] = useState<
-    {
-      x: number | null;
-      y: number | null;
-    }[]
-  >([]);
+    [
+      {
+        x: number | null;
+        y: number | null;
+      },
+      {
+        x: number | null;
+        y: number | null;
+      }
+    ]
+  >([
+    { x: null, y: null },
+    { x: null, y: null },
+  ]);
 
   useEffect(() => {
     const updateMousePosition = (e: MouseEvent) => {
       setMousePosition({ x: e.clientX, y: e.clientY });
     };
+    const updateTaps = (e: TouchEvent) => {
+      setTaps([
+        { x: e.touches[0].clientX, y: e.touches[0].clientY },
+        { x: e.touches[0].clientX, y: e.touches[0].clientY },
+      ]);
+    };
     window.addEventListener("mousemove", updateMousePosition);
+    window.addEventListener("touchmove", updateTaps);
     return () => {
       window.removeEventListener("mousemove", updateMousePosition);
+      window.removeEventListener("touchmove", updateTaps);
     };
   }, []);
 
@@ -33,7 +50,7 @@ export default function App({ Component, pageProps }: AppProps) {
     };
     const handleTap = (e: TouchEvent) => {
       setTaps((prev) => [
-        ...prev,
+        { x: prev[1].x, y: prev[1].y },
         { x: e.touches[0].clientX, y: e.touches[0].clientY },
       ]);
     };
@@ -49,12 +66,24 @@ export default function App({ Component, pageProps }: AppProps) {
     const handleClick = (e: MouseEvent) => {
       setClicked({ x: null, y: null });
     };
+    const handleTap = (e: TouchEvent) => {
+      setTaps([
+        { x: null, y: null },
+        { x: null, y: null },
+      ]);
+    };
 
     window.addEventListener("mouseup", handleClick);
+    window.addEventListener("touchend", handleTap);
     return () => {
       window.removeEventListener("mouseup", handleClick);
+      window.removeEventListener("touchend", handleTap);
     };
   }, []);
+
+  useEffect(() => {
+    console.log(taps);
+  }, [taps]);
 
   const lenis = useLenis((lenis) => {});
 
@@ -64,15 +93,6 @@ export default function App({ Component, pageProps }: AppProps) {
       <MousePositionContext
         value={{ position: mousePosition, clicked: clicked, taps: taps }}
       >
-        {/* <div className="fixed top-32 left-0 pointer-events-none z-10">
-          Taps
-          {taps.map((tap, index) => (
-            <span
-              key={index}
-              className="block"
-            >{`Tap at (${tap.x}, ${tap.y})`}</span>
-          ))}
-        </div> */}
         <Component {...pageProps} />
       </MousePositionContext>
     </Fragment>

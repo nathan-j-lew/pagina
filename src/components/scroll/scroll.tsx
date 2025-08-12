@@ -28,6 +28,8 @@ export const ScrollIndicator = ({
   const lenis = useLenis((lenis) => {
     if (mousePosition.clicked.x != null) return;
     if (mousePosition.clicked.y != null) return;
+    if (mousePosition.taps[0].x != null) return;
+    if (mousePosition.taps[0].y != null) return;
   });
   const mousePosition = useContext(MousePositionContext);
 
@@ -87,11 +89,17 @@ export const ScrollIndicator = ({
   });
 
   const trackedMousePosition = useMemo(() => {
+    if (mousePosition.taps[1].x !== null && mousePosition.taps[1].y !== null) {
+      return {
+        x: trunc(mousePosition.taps[1].x - dial.x),
+        y: trunc(mousePosition.taps[1].y - dial.y),
+      };
+    }
     return {
       x: trunc((mousePosition.position.x ?? 0) - dial.x),
       y: trunc((mousePosition.position.y ?? 0) - dial.y),
     };
-  }, [mousePosition.position, mousePosition.clicked, dial]);
+  }, [mousePosition.position, mousePosition.clicked, mousePosition.taps, dial]);
 
   const prevMousePosition = useRef<{
     x: number;
@@ -112,9 +120,21 @@ export const ScrollIndicator = ({
       y: trackedMousePosition.y,
     };
 
-    const len1 = Math.hypot(vec1.x, vec1.y);
+    const touchVec1 = {
+      x: mousePosition.taps[0].x ? mousePosition.taps[0].x - dial.x : 0,
+      y: mousePosition.taps[0].y ? mousePosition.taps[0].y - dial.y : 0,
+    };
 
+    const touchVec2 = {
+      x: mousePosition.taps[1].x ? mousePosition.taps[1].x - dial.x : 0,
+      y: mousePosition.taps[1].y ? mousePosition.taps[1].y - dial.y : 0,
+    };
+
+    const len1 = Math.hypot(vec1.x, vec1.y);
     const len2 = Math.hypot(vec2.x, vec2.y);
+
+    const lenTouch1 = Math.hypot(touchVec1.x, touchVec1.y);
+    const lenTouch2 = Math.hypot(touchVec2.x, touchVec2.y);
 
     const norm1 = {
       x: vec1.x / len1,
@@ -126,43 +146,87 @@ export const ScrollIndicator = ({
       y: vec2.y / len2,
     };
 
+    const normTouch1 = {
+      x: touchVec1.x / lenTouch1 || 0,
+      y: touchVec1.y / lenTouch1 || 0,
+    };
+
+    const normTouch2 = {
+      x: touchVec2.x / lenTouch2 || 0,
+      y: touchVec2.y / lenTouch2 || 0,
+    };
+
     const numerator = trunc(norm1.x * norm2.x + norm1.y * norm2.y);
+    const numeratorTouch = trunc(
+      normTouch1.x * normTouch2.x + normTouch1.y * normTouch2.y
+    );
     const denominator = trunc(
       Math.hypot(norm1.x, norm1.y) * Math.hypot(norm2.x, norm2.y)
     );
+    const denominatorTouch = trunc(
+      Math.hypot(normTouch1.x, normTouch1.y) *
+        Math.hypot(normTouch2.x, normTouch2.y)
+    );
     const dotProduct = trunc(numerator / denominator);
+    const dotProductTouch = trunc(numeratorTouch / denominatorTouch);
 
     let theta = trunc(Math.acos(dotProduct));
+    let thetaTouch = trunc(Math.acos(dotProductTouch));
     const det = trunc(norm1.x * norm2.y - norm1.y * norm2.x);
+    const detTouch = trunc(
+      normTouch1.x * normTouch2.y - normTouch1.y * normTouch2.x
+    );
     return {
       angle: theta,
+      angleTouch: thetaTouch,
       det: det,
+      detTouch: detTouch,
     };
-  }, [trackedMousePosition, prevMousePosition.current]);
+  }, [trackedMousePosition, prevMousePosition.current, mousePosition.taps]);
 
   useEffect(() => {
-    if (mousePosition.clicked.x !== null && mousePosition.clicked.y !== null) {
-      //   if (Math.abs(newAngle) <= 10) {
-      // setNewAngle((old) => trunc(old + dot.angle * (dot.det > 0 ? 1 : -1)));
+    if (
+      (mousePosition.clicked.x !== null && mousePosition.clicked.y !== null) ||
+      mousePosition.taps[0].x !== null
+    ) {
       const dist = Math.hypot(trackedMousePosition.x, trackedMousePosition.y);
       if (dist < dial.radius) {
         const test = trunc(
-          scrollYProgress.get() + dot.angle * (dot.det > 0 ? 1 : -1)
+          scrollYProgress.get() +
+            dot.angle *
+              (dot.det > 0 ? 1 : -1) *
+              (mousePosition.taps[0].x !== null ? 0.1 : 0.1)
         );
         lenis?.scrollTo(
-          (lenis.dimensions.scrollHeight - lenis.dimensions.height) * test
+          (lenis.dimensions.scrollHeight - lenis.dimensions.height) * test,
+          {
+            immediate: true,
+            // duration: 0.5,
+            // easing: (t) => t * (2 - t), // easeInOut
+          }
         );
       }
-      //   }
     }
   }, [dot]);
 
   return (
     <Fragment>
-      <div className="fixed top-0 inset-x-0 flex justify-center mb-4">
-        {/* {newAngle} */}
-        {/* {dial.x} {dial.y} {dial.radius} */}
-      </div>
+      {/* <div className="fixed top-0 right-0 w-full h-full pointer-events-none z-50">
+        {trackedMousePosition.x !== 0 && (
+          <Fragment>
+            <div>
+              {prevMousePosition.current.x}, {prevMousePosition.current.y}
+            </div>
+            <div>
+              {trackedMousePosition.x}, {trackedMousePosition.y}
+            </div>
+            <div>
+              {dial.x}, {dial.y}
+            </div>
+            <div>{dial.radius}</div>
+          </Fragment>
+        )}
+      </div> */}
       <div className="fixed bottom-0 inset-x-0 flex justify-center mb-4">
         <motion.svg
           className="size-18"
@@ -174,14 +238,16 @@ export const ScrollIndicator = ({
             cursor: "pointer",
             touchAction: "none",
           }}
-          onHoverStart={() => {
+          onPointerEnter={() => {
             scale.set(4);
             y.set("-150%");
           }}
-          onHoverEnd={() => {
+          onPointerLeave={() => {
             scale.set(1);
             y.set("0%");
           }}
+          //   onPointer
+          //   whileTap={}
           ref={ref}
         >
           <motion.circle
