@@ -244,8 +244,8 @@ export const ScrollIndicator = ({
             touchAction: "none",
           }}
           onPointerEnter={() => {
-            scale.set(4);
-            y.set("-150%");
+            scale.set(3);
+            y.set("-100%");
           }}
           onPointerLeave={() => {
             scale.set(1);

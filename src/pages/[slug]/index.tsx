@@ -57,12 +57,9 @@ export default function Page({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed top-8 left-8 z-10 text-lg leading-none"
+          className="fixed top-1/20 left-1/20 z-10 text-lg leading-none"
         >
-          <Link
-            href="/"
-            className="mix-blend-difference flex items-center gap-x-1"
-          >
+          <Link href="/" className="mix-blend-difference flex items-center">
             <ChevronLeft className="fill-foreground size-6" /> Back to home
           </Link>
         </motion.div>
