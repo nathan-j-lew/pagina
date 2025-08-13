@@ -1,5 +1,5 @@
 import { Libre_Bodoni } from "next/font/google";
-// import ChevronLeft from "@/assets/icons/chevron-left.svg";
+import ChevronLeft from "@/assets/icons/chevron-left.svg";
 import { motion, useScroll, useTransform } from "motion/react";
 import Link from "next/link";
 import { getSpreadData, getSpreadSlugs } from "@/lib/spreads";
@@ -51,7 +51,7 @@ export default function Page({
           className="fixed top-1/20 left-1/20 z-10 text-lg leading-none"
         >
           <Link href="/" className="mix-blend-difference flex items-center">
-            Back to home
+            <ChevronLeft className="fill-foreground size-6" /> Back to home
           </Link>
         </motion.div>
         <ScrollIndicator scrollYProgress={scrollYProgress} />
