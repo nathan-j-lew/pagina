@@ -28,7 +28,7 @@ export default function Home({
     >
       <motion.main className="flex flex-col items-center relative">
         <motion.section
-          className="fixed left-0 top-0 w-full h-screen"
+          className="fixed left-0 top-0 w-full h-dvh"
           layoutScroll
         >
           <div className="flex flex-col items-center justify-center gap-4 size-full">
