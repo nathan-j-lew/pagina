@@ -2,7 +2,7 @@ import "@/styles/globals.css";
 import type { AppProps } from "next/app";
 import { MousePositionContext } from "@/context/MousePosition/MousePosition";
 import { useState, useEffect, Fragment } from "react";
-import ReactLenis, { useLenis } from "lenis/react";
+import ReactLenis from "lenis/react";
 
 export default function App({ Component, pageProps }: AppProps) {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
@@ -84,8 +84,6 @@ export default function App({ Component, pageProps }: AppProps) {
   useEffect(() => {
     console.log(taps);
   }, [taps]);
-
-  const lenis = useLenis((lenis) => {});
 
   return (
     <Fragment>

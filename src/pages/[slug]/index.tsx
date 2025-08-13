@@ -1,13 +1,6 @@
-import Image from "next/image";
 import { Libre_Bodoni } from "next/font/google";
 import ChevronLeft from "@/assets/icons/chevron-left.svg";
-import {
-  motion,
-  useMotionValueEvent,
-  useScroll,
-  useTransform,
-} from "motion/react";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { motion, useScroll, useTransform } from "motion/react";
 import Link from "next/link";
 import { getSpreadData, getSpreadSlugs } from "@/lib/spreads";
 import { ScrollIndicator } from "@/components/scroll/scroll";
@@ -24,6 +17,7 @@ export default function Page({
     title: string;
     hex: string;
     slug: string;
+    order: number;
   };
 }) {
   const { scrollYProgress } = useScroll();

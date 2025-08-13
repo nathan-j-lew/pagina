@@ -1,7 +1,6 @@
-import Image from "next/image";
 import { Libre_Bodoni } from "next/font/google";
 import { motion, useMotionValueEvent, useScroll } from "motion/react";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { getSortedSpreadsData } from "@/lib/spreads";
 
@@ -13,7 +12,7 @@ const libreBodoni = Libre_Bodoni({
 export default function Home({
   data,
 }: {
-  data: { title: string; hex: string; slug: string }[];
+  data: { title: string; hex: string; slug: string; order: number }[];
 }) {
   const { scrollYProgress } = useScroll();
   const [currentItem, setCurrentItem] = useState(0);
