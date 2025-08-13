@@ -21,7 +21,6 @@ export default function Home({
     if (latest < 0.01) return;
     setCurrentItem(index >= data.length ? data.length - 1 : index);
   });
-  console.log("data", data);
 
   return (
     <div

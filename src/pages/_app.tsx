@@ -63,10 +63,10 @@ export default function App({ Component, pageProps }: AppProps) {
   }, []);
 
   useEffect(() => {
-    const handleClick = (e: MouseEvent) => {
+    const handleClick = () => {
       setClicked({ x: null, y: null });
     };
-    const handleTap = (e: TouchEvent) => {
+    const handleTap = () => {
       setTaps([
         { x: null, y: null },
         { x: null, y: null },

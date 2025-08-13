@@ -1,15 +1,12 @@
 import {
   motion,
   MotionValue,
-  useMotionValue,
   useMotionValueEvent,
   useSpring,
   useTransform,
 } from "motion/react";
 import {
   Fragment,
-  memo,
-  use,
   useContext,
   useEffect,
   useMemo,
@@ -25,12 +22,7 @@ export const ScrollIndicator = ({
 }: {
   scrollYProgress: MotionValue;
 }) => {
-  const lenis = useLenis((lenis) => {
-    if (mousePosition.clicked.x != null) return;
-    if (mousePosition.clicked.y != null) return;
-    if (mousePosition.taps[0].x != null) return;
-    if (mousePosition.taps[0].y != null) return;
-  });
+  const lenis = useLenis(() => {});
   const mousePosition = useContext(MousePositionContext);
 
   const [dial, setDial] = useState({ x: 0, y: 0, radius: 0 });

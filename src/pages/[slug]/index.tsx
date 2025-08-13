@@ -13,12 +13,7 @@ const libreBodoni = Libre_Bodoni({
 export default function Page({
   spreadData,
 }: {
-  spreadData: {
-    title: string;
-    hex: string;
-    slug: string;
-    order: number;
-  };
+  spreadData: { title: string; hex: string };
 }) {
   const { scrollYProgress } = useScroll();
   const mix = useTransform(
@@ -27,7 +22,9 @@ export default function Page({
     [spreadData.hex, "#888888"]
   );
   return (
-    <div className={`${libreBodoni.className} font-sans`}>
+    <div
+      className={`${libreBodoni.className} font-sans scrollbar-gutter-stable`}
+    >
       <motion.main className="flex flex-col items-center relative h-[500lvh]">
         <motion.div
           className="fixed inset-0 -z-1"
@@ -73,6 +70,12 @@ export async function getStaticPaths() {
 
 export async function getStaticProps({ params }: { params: { slug: string } }) {
   const spreadData = getSpreadData(params.slug);
+  console.log(spreadData);
+  if (!spreadData) {
+    return {
+      notFound: true,
+    };
+  }
   return {
     props: {
       spreadData,
