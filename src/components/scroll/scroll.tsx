@@ -192,7 +192,7 @@ export const ScrollIndicator = ({
           </Fragment>
         )}
       </div> */}
-      <div className="fixed bottom-0 inset-x-0 flex justify-center mb-4">
+      <div className="fixed bottom-0 inset-x-0 flex justify-center mb-4 select-none">
         <motion.svg
           className="size-18"
           viewBox={"0 0 64 64"}
