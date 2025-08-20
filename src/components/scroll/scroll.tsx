@@ -1,6 +1,7 @@
 import {
   motion,
   MotionValue,
+  useMotionValue,
   useMotionValueEvent,
   useSpring,
   useTransform,
@@ -24,6 +25,7 @@ export const ScrollIndicator = ({
 }) => {
   const lenis = useLenis(() => {});
   const mousePosition = useContext(MousePositionContext);
+  const angle = useMotionValue(0);
 
   const [dial, setDial] = useState({ x: 0, y: 0, radius: 0 });
 
@@ -38,6 +40,20 @@ export const ScrollIndicator = ({
     damping: 15,
   });
 
+  const scale2 = useSpring(1, {
+    stiffness: 150,
+    damping: 15,
+  });
+  const y2 = useSpring("0%", {
+    stiffness: 150,
+    damping: 15,
+  });
+
+  const dialO = useSpring(0, {
+    stiffness: 150,
+    damping: 15,
+  });
+
   useMotionValueEvent(scrollYProgress, "change", (latest) => {
     console.log("scrollYProgress", latest);
   });
@@ -47,6 +63,9 @@ export const ScrollIndicator = ({
   const clampedScrollYProgress = useTransform(scrollYProgress, [0, 1], [0, 1], {
     clamp: true,
   });
+
+  const scrollAngle = useTransform(scrollYProgress, [0, 1], [0, 360]);
+
   const strokeDashoffset = useTransform(
     clampedScrollYProgress,
     (value) => circumference * (1 - value)
@@ -144,6 +163,12 @@ export const ScrollIndicator = ({
     };
   }, [trackedMousePosition, prevMousePosition.current, mousePosition.taps]);
 
+  useMotionValueEvent(dialO, "change", () => {
+    if (dialO.get() === 0) {
+      angle.jump(0);
+    }
+  });
+
   useEffect(() => {
     if (
       (mousePosition.clicked.x !== null && mousePosition.clicked.y !== null) ||
@@ -158,11 +183,15 @@ export const ScrollIndicator = ({
         dist < dial.radius ||
         (mousePosition.taps[0].x !== null && distInit < dial.radius)
       ) {
+        console.log(dist);
         const test = trunc(
           scrollYProgress.get() +
             dot.angle *
               (dot.det > 0 ? 1 : -1) *
               (mousePosition.taps[0].x !== null ? 0.2 : 0.2)
+        );
+        angle.set(
+          angle.get() + dot.angle * (dot.det > 0 ? 1 : -1) * Math.PI * 8
         );
         lenis?.scrollTo(
           (lenis.dimensions.scrollHeight - lenis.dimensions.height) * test,
@@ -176,79 +205,121 @@ export const ScrollIndicator = ({
 
   return (
     <Fragment>
-      {/* <div className="fixed top-0 right-0 w-full h-full pointer-events-none z-50">
-        {trackedMousePosition.x !== 0 && (
-          <Fragment>
-            <div>
-              {prevMousePosition.current.x}, {prevMousePosition.current.y}
+      <div className="fixed top-16 left-1/20">
+        {mousePosition.taps[0].x !== null &&
+          mousePosition.taps[0].y !== null && (
+            <div className="text-sm font-mono text-foreground/50 select-none pointer-events-none">
+              {mousePosition.taps[0].x}, {mousePosition.taps[0].y}
             </div>
-            <div>
-              {trackedMousePosition.x}, {trackedMousePosition.y}
+          )}
+        {mousePosition.taps[1].x !== null &&
+          mousePosition.taps[1].y !== null && (
+            <div className="text-sm font-mono text-foreground/50 select-none pointer-events-none">
+              {mousePosition.taps[1].x}, {mousePosition.taps[1].y}
             </div>
-            <div>
-              {dial.x}, {dial.y}
-            </div>
-            <div>{dial.radius}</div>
-          </Fragment>
-        )}
-      </div> */}
-      <div className="fixed bottom-0 inset-x-0 flex justify-center mb-4 select-none">
-        <motion.svg
-          className="size-18"
-          viewBox={"0 0 64 64"}
-          id="scroll-bounds"
-          style={{
-            scale,
-            y,
-            cursor: "pointer",
-            touchAction: "none",
-          }}
+          )}
+        <div className="text-sm font-mono text-foreground/50 select-none pointer-events-none">
+          {dial.radius}
+        </div>
+      </div>
+      <div className="fixed bottom-0 inset-x-0 flex flex-col items-center justify-center mb-4 select-none">
+        <motion.div
+          className="relative flex flex-col items-center justify-center"
           onPointerEnter={() => {
             scale.set(3);
             y.set("-100%");
+            y2.set("-320%");
+            dialO.set(1);
           }}
           onPointerLeave={() => {
             scale.set(1);
             y.set("0%");
+            y2.set("0%");
+            dialO.set(0);
           }}
-          //   onPointer
-          //   whileTap={}
-          ref={ref}
         >
-          <motion.circle
-            cx="32"
-            cy="32"
-            r="32"
+          <motion.svg
+            className="size-18 absolute z-1"
+            viewBox={"0 0 64 64"}
+            id="scroll-bounds"
             style={{
-              fill: "var(--foreground)",
-              opacity: 0.1,
+              scale: scale2,
+              y: y2,
+              cursor: "pointer",
+              touchAction: "pan-x pan-y",
             }}
-            // onPointerDownCapture={(e) => e.stopPropagation()}
-          />
-          <motion.circle
-            key={"scroll-path"}
-            cx="32"
-            cy="32"
-            r="16"
+          >
+            <motion.circle
+              cx="32"
+              cy="32"
+              r="32"
+              style={{
+                fill: "var(--foreground)",
+                opacity: 0.1,
+              }}
+              // onPointerDownCapture={(e) => e.stopPropagation()}
+            />
+            <motion.circle
+              key={"scroll-path"}
+              cx="32"
+              cy="32"
+              r="16"
+              style={{
+                //   pathLength: scrollYProgress,
+                fill: "none",
+                stroke: "var(--foreground)",
+                strokeWidth: 32,
+                strokeDasharray: circumference,
+                strokeDashoffset: testOffset,
+              }}
+            />
+          </motion.svg>
+          <motion.svg
+            className="size-18 "
+            viewBox={"0 0 64 64"}
             style={{
-              //   pathLength: scrollYProgress,
-              fill: "none",
-              stroke: "var(--foreground)",
-              strokeWidth: 32,
-              strokeDasharray: circumference,
-              strokeDashoffset: testOffset,
+              scale,
+              y,
+              opacity: dialO,
+              cursor: "pointer",
+              touchAction: "none",
             }}
-          />
-
-          {/* <motion.circle
-            cx="32"
-            cy="32"
-            r="2"
-            style={{
-              fill: "blue",
-            }}
-          /> */}
-        </motion.svg>
+            ref={ref}
+          >
+            <motion.circle
+              cx="32"
+              cy="32"
+              r="30"
+              style={{
+                fill: "var(--foreground)",
+                // opacity: 0.1,
+              }}
+              // onPointerDownCapture={(e) => e.stopPropagation()}
+            />
+            <motion.circle
+              key={"scroll-path"}
+              cx="32"
+              cy="32"
+              r="16"
+              style={{
+                //   pathLength: scrollYProgress,
+                fill: "none",
+                stroke: "var(--foreground)",
+                strokeWidth: 32,
+                strokeDasharray: "1",
+                rotate: angle,
+              }}
+            />
+            {/* <motion.circle
+              cx="32"
+              cy="32"
+              r="2"
+              style={{
+                fill: "blue",
+              }}
+            /> */}
+          </motion.svg>
+        </motion.div>
       </div>
     </Fragment>
   );
