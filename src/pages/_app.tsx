@@ -87,7 +87,7 @@ export default function App({ Component, pageProps }: AppProps) {
 
   return (
     <Fragment>
-      <ReactLenis root />
+      <ReactLenis root options={{ syncTouch: true }} />
       <MousePositionContext
         value={{ position: mousePosition, clicked: clicked, taps: taps }}
       >
