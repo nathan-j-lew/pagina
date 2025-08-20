@@ -246,7 +246,7 @@ export const ScrollIndicator = ({
               scale: scale2,
               y: y2,
               cursor: "pointer",
-              touchAction: "pan-x pan-y",
+              touchAction: "none",
             }}
           >
             <motion.circle
