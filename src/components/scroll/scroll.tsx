@@ -162,7 +162,7 @@ export const ScrollIndicator = ({
           scrollYProgress.get() +
             dot.angle *
               (dot.det > 0 ? 1 : -1) *
-              (mousePosition.taps[0].x !== null ? 0.1 : 0.1)
+              (mousePosition.taps[0].x !== null ? 0.5 : 0.5)
         );
         lenis?.scrollTo(
           (lenis.dimensions.scrollHeight - lenis.dimensions.height) * test,
