@@ -90,7 +90,7 @@ export async function getStaticProps() {
   // });
   const resources: CloudinaryResource[] = results.resources;
 
-  let reducedResults: {
+  const reducedResults: {
     id: number;
     height: number;
     width: number;
@@ -109,9 +109,7 @@ export async function getStaticProps() {
     return dataUrl;
   }
 
-  for (let result of resources) {
-    // console.log(result.public_id);
-
+  for (const result of resources) {
     const imageUrl = getCldImageUrl({
       src: result.public_id,
       width: 100, // Resize the original file to a smaller size
