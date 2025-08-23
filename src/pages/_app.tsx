@@ -81,9 +81,9 @@ export default function App({ Component, pageProps }: AppProps) {
     };
   }, []);
 
-  useEffect(() => {
-    console.log(taps);
-  }, [taps]);
+  // useEffect(() => {
+  //   console.log(taps);
+  // }, [taps]);
 
   return (
     <Fragment>

@@ -27,8 +27,9 @@ export default function Home({
       className={`${libreBodoni.className} font-sans scrollbar-gutter-stable`}
     >
       <nav className="fixed top-0 inset-x-0 z-10">
-        <div className="px-[5%]">
+        <div className="px-[5%] flex space-x-4">
           <Link href="/about">About</Link>
+          <Link href="/image">Test</Link>
         </div>
       </nav>
       <motion.main className="flex flex-col items-center relative">
