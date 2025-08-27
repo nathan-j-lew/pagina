@@ -54,13 +54,14 @@ export default function ImageTest({
       <motion.main className="sticky top-0 flex flex-col items-center">
         {images != undefined &&
           images.map(
-            (image) =>
-              image.id == currentItem && (
+            (image, i) =>
+              i == currentItem && (
                 <div key={image.id} className="m-10">
                   <h2>{image.title}</h2>
+                  <p>{image.public_id}</p>
                   <CldImage
                     src={image.public_id}
-                    alt={image.id ? `Image ${image.id}` : "Image"}
+                    alt={image.public_id}
                     width={image.width}
                     height={image.height}
                     sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
@@ -121,9 +122,14 @@ export async function getStaticProps() {
     i++;
   }
 
-  // console.log(reducedResults);
+  const sortedResults = reducedResults.sort((a, b) => {
+    const val_a = parseInt(a.public_id.split("_")[1]);
+    const val_b = parseInt(b.public_id.split("_")[1]);
+    console.log(val_b);
+    return val_a - val_b;
+  });
 
   return {
-    props: { images: reducedResults },
+    props: { images: sortedResults },
   };
 }
