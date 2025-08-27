@@ -22,6 +22,9 @@ export default function ImageTest({
     image: string;
     width: number;
     height: number;
+    public_id: string;
+    format: string;
+    blurDataURL?: string;
   }[];
   // };
 }) {
@@ -48,10 +51,10 @@ export default function ImageTest({
           <Link href="/">Back</Link>
         </div>
       </nav>
-      <motion.main className="sticky top-0 flex flex-col items-center relative">
+      <motion.main className="sticky top-0 flex flex-col items-center">
         {images != undefined &&
           images.map(
-            (image: any) =>
+            (image) =>
               image.id == currentItem && (
                 <div key={image.id} className="m-10">
                   <h2>{image.title}</h2>
@@ -74,20 +77,11 @@ export default function ImageTest({
 }
 
 export async function getStaticProps() {
-  // cloudinary.config({
-  //   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  //   api_key: process.env.CLOUDINARY_API_KEY,
-  //   api_secret: process.env.CLOUDINARY_API_SECRET,
-  //   secure: true,
-  // });
-
   const results = await cloudinary.v2.search
     .expression("boggeri")
     .max_results(16)
     .execute();
-  // .then((res) => {
-  //   res.resources;
-  // });
+
   const resources: CloudinaryResource[] = results.resources;
 
   const reducedResults: {
