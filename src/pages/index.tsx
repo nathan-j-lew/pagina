@@ -38,6 +38,15 @@ export default function Home({
   });
 
   const [play] = useSound(`/audio/dial${currentAudio}.mp3`);
+  const [playSprite] = useSound("/audio/sprite.wav", {
+    sprite: {
+      1: [0, 300],
+      2: [500, 300],
+      3: [1000, 300],
+      4: [1500, 300],
+      5: [2000, 300],
+    },
+  });
 
   return (
     <div
@@ -67,7 +76,7 @@ export default function Home({
           className="fixed left-0 top-0 w-full h-dvh"
           layoutScroll
         >
-          <div className="flex flex-col items-center justify-center gap-4 mx-auto aspect-55/89 max-h-[100vmin] max-w-[100vmin]">
+          <div className="flex flex-col items-center justify-center gap-2 mx-auto aspect-55/89 max-h-[100vmin] max-w-[100vmin]">
             <motion.div
               className="w-full flex items-center justify-center "
               layoutId="title"
@@ -103,7 +112,7 @@ export default function Home({
                   className={`flex-1 border border-foreground relative`}
                   href={`#${data[j].slug}`}
                   onPointerEnter={() => {
-                    play();
+                    playSprite({ id: (j + 1).toString() });
                     setCurrentItem({
                       ...currentItem,
                       display: j,
