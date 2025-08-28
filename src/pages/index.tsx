@@ -38,7 +38,7 @@ export default function Home({
   });
 
   const [play] = useSound(`/audio/dial${currentAudio}.mp3`);
-  const [playSprite] = useSound("/audio/sprite.wav", {
+  const [playSprite] = useSound("/audio/pizzicato.mp3", {
     sprite: {
       1: [0, 300],
       2: [500, 300],
