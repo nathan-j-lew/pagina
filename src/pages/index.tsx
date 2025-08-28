@@ -1,8 +1,11 @@
 import { Libre_Bodoni } from "next/font/google";
 import { motion, useMotionValueEvent, useScroll } from "motion/react";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import Link from "next/link";
 import { getSortedSpreadsData } from "@/lib/spreads";
+import { useLenis } from "lenis/react";
+import useSound from "use-sound";
+// import dial from "@/assets/audio/dial.mp3";
 
 const libreBodoni = Libre_Bodoni({
   variable: "--font-libre-bodoni",
@@ -14,13 +17,24 @@ export default function Home({
 }: {
   data: { title: string; hex: string; slug: string; order: number }[];
 }) {
+  const audioRef = useRef<HTMLAudioElement>(null);
+  const lenis = useLenis();
+
   const { scrollYProgress } = useScroll();
-  const [currentItem, setCurrentItem] = useState(0);
+  const [currentItem, setCurrentItem] = useState({
+    original: 0,
+    display: 0,
+  });
   useMotionValueEvent(scrollYProgress, "change", (latest) => {
     const index = Math.floor(latest * data.length);
     if (latest < 0.01) return;
-    setCurrentItem(index >= data.length ? data.length - 1 : index);
+    setCurrentItem({
+      original: index >= data.length ? data.length - 1 : index,
+      display: index >= data.length ? data.length - 1 : index,
+    });
   });
+
+  const [play] = useSound("/audio/dial.mp3");
 
   return (
     <div
@@ -44,13 +58,13 @@ export default function Home({
               layout="position"
             >
               <motion.h2 className="text-xl font-bold text-center text-foreground">
-                {data[currentItem].title}
+                {data[currentItem.display].title}
               </motion.h2>
             </motion.div>
-            <Link href={data[currentItem].slug}>
+            <Link href={data[currentItem.display].slug}>
               <motion.span
                 className="block aspect-square size-[80vmin] max-w-[40rem] max-h-[40rem] bg-blend-difference"
-                style={{ backgroundColor: data[currentItem].hex }}
+                style={{ backgroundColor: data[currentItem.display].hex }}
                 layoutId="background"
               />
             </Link>
@@ -59,19 +73,36 @@ export default function Home({
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
+              // onMouseLeave={() => {
+              //   setCurrentItem((original) => ({
+              //     original: original.original,
+              //     display: original.original,
+              //   }));
+              //   lenis?.scrollTo(`#${data[currentItem.original].slug}`);
+              // }}
             >
               {data.map((_, j) => (
                 <Link
                   key={`item-${j}`}
                   className={`flex-1 border border-foreground relative`}
                   href={`#${data[j].slug}`}
+                  onPointerEnter={() => {
+                    play();
+                    setCurrentItem({
+                      ...currentItem,
+                      display: j,
+                    });
+                    lenis?.scrollTo(`#${data[j].slug}`, {
+                      immediate: true,
+                    });
+                  }}
                 >
                   <span className="absolute h-12 w-full -translate-1/2 top-1/2 left-1/2 any-pointer-fine:hidden" />
                 </Link>
               ))}
               <motion.div
                 className={`bg-foreground absolute h-full w-1/5`}
-                style={{ x: currentItem * 100 + "%" }}
+                style={{ x: currentItem.display * 100 + "%" }}
               />
             </motion.div>
           </div>
