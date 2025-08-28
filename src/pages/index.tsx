@@ -51,7 +51,7 @@ export default function Home({
       </nav>
       <motion.main className="flex flex-col items-center relative">
         <aside className="fixed right-0 top-1/2 -translate-y-1/2 p-4 z-50 flex flex-col gap-2">
-          {[1, 2, 3].map((audio) => (
+          {[1, 2, 3, 4].map((audio) => (
             <button
               key={audio}
               onClick={() => {
