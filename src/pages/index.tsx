@@ -17,14 +17,17 @@ export default function Home({
 }: {
   data: { title: string; hex: string; slug: string; order: number }[];
 }) {
-  const audioRef = useRef<HTMLAudioElement>(null);
   const lenis = useLenis();
 
   const { scrollYProgress } = useScroll();
+
   const [currentItem, setCurrentItem] = useState({
     original: 0,
     display: 0,
   });
+
+  const [currentAudio, setCurrentAudio] = useState(1);
+
   useMotionValueEvent(scrollYProgress, "change", (latest) => {
     const index = Math.floor(latest * data.length);
     if (latest < 0.01) return;
@@ -34,7 +37,7 @@ export default function Home({
     });
   });
 
-  const [play] = useSound("/audio/dial.mp3");
+  const [play] = useSound(`/audio/dial${currentAudio}.mp3`);
 
   return (
     <div
@@ -47,29 +50,42 @@ export default function Home({
         </div>
       </nav>
       <motion.main className="flex flex-col items-center relative">
+        <aside className="fixed right-0 top-1/2 -translate-y-1/2 p-4 z-50 flex flex-col gap-2">
+          {[1, 2].map((audio) => (
+            <button
+              key={audio}
+              onClick={() => {
+                setCurrentAudio(audio);
+              }}
+              className="cursor-pointer border border-foreground px-2 py-1 m-1 hover:bg-foreground/5 active:bg-foreground/10"
+            >
+              Version {audio}
+            </button>
+          ))}
+        </aside>
         <motion.section
           className="fixed left-0 top-0 w-full h-dvh"
           layoutScroll
         >
-          <div className="flex flex-col items-center justify-center gap-4 size-full">
+          <div className="flex flex-col items-center justify-center gap-4 mx-auto aspect-55/89 max-h-[100vmin] max-w-[100vmin]">
             <motion.div
               className="w-full flex items-center justify-center "
               layoutId="title"
               layout="position"
             >
-              <motion.h2 className="text-xl font-bold text-center text-foreground">
+              {/* <motion.h2 className="text-xl font-bold text-center text-foreground">
                 {data[currentItem.display].title}
-              </motion.h2>
+              </motion.h2> */}
             </motion.div>
-            <Link href={data[currentItem.display].slug}>
+            <Link href={data[currentItem.display].slug} className="w-full">
               <motion.span
-                className="block aspect-square size-[80vmin] max-w-[40rem] max-h-[40rem] bg-blend-difference"
+                className="block aspect-square max-w-[40rem] max-h-[40rem] size-full bg-blend-difference"
                 style={{ backgroundColor: data[currentItem.display].hex }}
                 layoutId="background"
               />
             </Link>
             <motion.div
-              className="h-4 border border-foreground w-[80vmin] flex relative max-w-[40rem]"
+              className="h-full w-full flex relative gap-2 max-w-[40rem]"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
@@ -97,12 +113,16 @@ export default function Home({
                     });
                   }}
                 >
-                  <span className="absolute h-12 w-full -translate-1/2 top-1/2 left-1/2 any-pointer-fine:hidden" />
+                  <span className="absolute h-full w-full -translate-1/2 top-1/2 left-1/2 any-pointer-fine:hidden" />
                 </Link>
               ))}
               <motion.div
-                className={`bg-foreground absolute h-full w-1/5`}
-                style={{ x: currentItem.display * 100 + "%" }}
+                className={`bg-foreground absolute h-full w-[calc((100%-2rem)/5)]`}
+                style={{
+                  x: `calc(${currentItem.display * 100}% + ${
+                    currentItem.display * 0.5
+                  }rem)`,
+                }}
               />
             </motion.div>
           </div>
