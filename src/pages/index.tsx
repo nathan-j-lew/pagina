@@ -1,6 +1,6 @@
 import { Libre_Bodoni } from "next/font/google";
 import { motion, useMotionValueEvent, useScroll } from "motion/react";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { getSortedSpreadsData } from "@/lib/spreads";
 import { useLenis } from "lenis/react";
@@ -36,6 +36,12 @@ export default function Home({
       display: index >= data.length ? data.length - 1 : index,
     });
   });
+
+  useEffect(() => {
+    playSprite({
+      id: (currentItem.display + 1).toString(),
+    });
+  }, [currentItem.display]);
 
   const [play] = useSound(`/audio/dial${currentAudio}.mp3`);
   const [playSprite] = useSound("/audio/pizzicato.mp3", {
@@ -112,7 +118,7 @@ export default function Home({
                   className={`flex-1 border border-foreground relative`}
                   href={`#${data[j].slug}`}
                   onPointerEnter={() => {
-                    playSprite({ id: (j + 1).toString() });
+                    // playSprite({ id: (j + 1).toString() });
                     setCurrentItem({
                       ...currentItem,
                       display: j,
