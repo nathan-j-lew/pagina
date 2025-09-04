@@ -5,6 +5,7 @@ import Link from "next/link";
 import { getSortedSpreadsData } from "@/lib/spreads";
 import { useLenis } from "lenis/react";
 import useSound from "use-sound";
+import { Loader } from "@/components/loader/loader";
 // import dial from "@/assets/audio/dial.mp3";
 
 const libreBodoni = Libre_Bodoni({
@@ -66,13 +67,16 @@ export default function Home({
       </nav>
       <motion.main className="flex flex-col items-center relative">
         <motion.section
-          className="fixed left-0 top-0 w-full h-dvh py-4 flex flex-col overflow-hidden"
+          className="fixed left-0 top-0 w-full h-dvh py-2 flex flex-col overflow-hidden"
           layoutScroll
         >
           <div className="flex flex-col justify-center items-center h-full">
             <div
               className="flex flex-col items-center justify-stretch gap-2 aspect-55/89 object-contain my-auto overflow-hidden"
-              style={{ width: "min(100vw, calc(5500vh / 89))" }}
+              style={{
+                width:
+                  "min(calc(100vw - (1rem * 55 / 89)), calc((55 * (100vh - 1rem) / 89)))",
+              }}
             >
               <Link
                 href={data[currentItem.display].slug}

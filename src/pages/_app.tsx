@@ -3,8 +3,10 @@ import type { AppProps } from "next/app";
 import { MousePositionContext } from "@/context/MousePosition/MousePosition";
 import { useState, useEffect, Fragment } from "react";
 import ReactLenis from "lenis/react";
+import { Loader } from "@/components/loader/loader";
 
 export default function App({ Component, pageProps }: AppProps) {
+  const [loaded, setLoaded] = useState(false);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [clicked, setClicked] = useState<{
     x: number | null;
@@ -91,6 +93,7 @@ export default function App({ Component, pageProps }: AppProps) {
       <MousePositionContext
         value={{ position: mousePosition, clicked: clicked, taps: taps }}
       >
+        <Loader loaded={loaded} handler={() => setLoaded(true)} />
         <Component {...pageProps} />
       </MousePositionContext>
     </Fragment>
