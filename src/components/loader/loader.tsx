@@ -7,7 +7,7 @@ export const Loader = ({
   handler,
 }: {
   loaded: boolean;
-  handler: () => (value: SetStateAction<boolean>) => void;
+  handler: () => void;
 }) => {
   const ref = useRef<HTMLDialogElement>(null);
   const lenis = useLenis();
