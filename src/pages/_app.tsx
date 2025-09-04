@@ -4,6 +4,15 @@ import { MousePositionContext } from "@/context/MousePosition/MousePosition";
 import { useState, useEffect, Fragment } from "react";
 import ReactLenis from "lenis/react";
 import { Loader } from "@/components/loader/loader";
+import localFont from "next/font/local";
+
+const pizzi = localFont({
+  src: [
+    { path: "../styles/fonts/PizziVF.woff", weight: "400", style: "normal" },
+    { path: "../styles/fonts/PizziVF.woff2", weight: "400", style: "normal" },
+  ],
+  variable: "--font-pizzi",
+});
 
 export default function App({ Component, pageProps }: AppProps) {
   const [loaded, setLoaded] = useState(false);
@@ -93,8 +102,10 @@ export default function App({ Component, pageProps }: AppProps) {
       <MousePositionContext
         value={{ position: mousePosition, clicked: clicked, taps: taps }}
       >
-        <Loader loaded={loaded} handler={() => setLoaded(true)} />
-        <Component {...pageProps} />
+        <div className={`${pizzi.variable} font-sans scrollbar-gutter-stable`}>
+          <Loader loaded={loaded} handler={() => setLoaded(true)} />
+          <Component {...pageProps} />
+        </div>
       </MousePositionContext>
     </Fragment>
   );

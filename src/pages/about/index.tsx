@@ -1,6 +1,6 @@
 import { Libre_Bodoni } from "next/font/google";
 import { motion, useMotionValueEvent, useScroll } from "motion/react";
-import { useState } from "react";
+import { Fragment, useState } from "react";
 import Link from "next/link";
 import { getSortedSpreadsData } from "@/lib/spreads";
 
@@ -23,9 +23,7 @@ export default function About({
   });
 
   return (
-    <div
-      className={`${libreBodoni.className} font-sans scrollbar-gutter-stable`}
-    >
+    <Fragment>
       <nav className="fixed top-0 inset-x-0 z-10">
         <div className="px-[5%]">
           <Link href="/">Back</Link>
@@ -39,7 +37,7 @@ export default function About({
           <h1>About</h1>
         </section>
       </motion.main>
-    </div>
+    </Fragment>
   );
 }
 

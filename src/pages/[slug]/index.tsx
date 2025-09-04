@@ -12,7 +12,7 @@ import { ScrollIndicator } from "@/components/scroll/scroll";
 import { CldImage, getCldImageUrl } from "next-cloudinary";
 import { CloudinaryResource } from "@cloudinary-util/types";
 import cloudinary from "@/lib/cloudinary";
-import { useState } from "react";
+import { Fragment, useState } from "react";
 
 const libreBodoni = Libre_Bodoni({
   variable: "--font-libre-bodoni",
@@ -48,9 +48,7 @@ export default function Page({
     setCurrentItem(index >= images.length ? images.length - 1 : index);
   });
   return (
-    <div
-      className={`${libreBodoni.className} font-sans scrollbar-gutter-stable`}
-    >
+    <Fragment>
       <motion.main
         className="flex flex-col items-center relative"
         style={{
@@ -109,7 +107,7 @@ export default function Page({
         </motion.div>
         <ScrollIndicator scrollYProgress={scrollYProgress} />
       </motion.main>
-    </div>
+    </Fragment>
   );
 }
 
@@ -123,7 +121,7 @@ export async function getStaticPaths() {
 
 export async function getStaticProps({ params }: { params: { slug: string } }) {
   const spreadData = getSpreadData(params.slug);
-  console.log(spreadData);
+  // console.log(spreadData);
   if (!spreadData) {
     return {
       notFound: true,
@@ -177,7 +175,7 @@ export async function getStaticProps({ params }: { params: { slug: string } }) {
   const sortedResults = reducedResults.sort((a, b) => {
     const val_a = parseInt(a.public_id.split("_")[1]);
     const val_b = parseInt(b.public_id.split("_")[1]);
-    console.log(val_b);
+    // console.log(val_b);
     return val_a - val_b;
   });
 
