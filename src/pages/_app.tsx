@@ -1,6 +1,7 @@
 import "@/styles/globals.css";
 import type { AppProps } from "next/app";
 import { MousePositionContext } from "@/context/MousePosition/MousePosition";
+import { LoaderContext } from "@/context/Loader/Loader";
 import { useState, useEffect, Fragment } from "react";
 import ReactLenis from "lenis/react";
 import { Loader } from "@/components/loader/loader";
@@ -102,10 +103,14 @@ export default function App({ Component, pageProps }: AppProps) {
       <MousePositionContext
         value={{ position: mousePosition, clicked: clicked, taps: taps }}
       >
-        <div className={`${pizzi.variable} font-sans scrollbar-gutter-stable`}>
-          <Loader loaded={loaded} handler={() => setLoaded(true)} />
-          <Component {...pageProps} />
-        </div>
+        <LoaderContext value={{ loaded: loaded }}>
+          <div
+            className={`${pizzi.variable} font-sans scrollbar-gutter-stable`}
+          >
+            <Loader loaded={loaded} handler={() => setLoaded(true)} />
+            <Component {...pageProps} />
+          </div>
+        </LoaderContext>
       </MousePositionContext>
     </Fragment>
   );
