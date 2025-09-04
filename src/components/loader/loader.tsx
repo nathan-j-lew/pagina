@@ -46,7 +46,7 @@ export const Loader = ({
       animate={{ opacity: !loaded ? 1 : 0 }}
       exit={{ opacity: 0 }}
     >
-      <motion.ul className="flex justify-between gap-x-2 h-8" key="loader">
+      <motion.ul className="flex justify-between gap-x-1 h-8" key="loader">
         {Array.from({ length: 5 }).map((_, i) => (
           <motion.li
             key={`loader__item--${i}`}
