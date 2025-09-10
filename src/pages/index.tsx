@@ -51,13 +51,13 @@ export default function Home({
   }, [currentItem.display]);
 
   const { loaded } = useContext(LoaderContext);
-  const [playSprite] = useSound("/audio/pizzicato.mp3", {
+  const [playSprite] = useSound("/audio/sevenths.mp3", {
     sprite: {
-      1: [0, 300],
-      2: [500, 300],
-      3: [1000, 300],
-      4: [1500, 300],
-      5: [2000, 300],
+      1: [0, 400],
+      2: [500, 400],
+      3: [1000, 400],
+      4: [1500, 400],
+      5: [2000, 400],
     },
   });
 
