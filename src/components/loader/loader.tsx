@@ -36,7 +36,7 @@ export const Loader = ({
   return (
     <motion.dialog
       open={!loaded}
-      className="fixed size-full top-0 left-0 bg-background/10 text-foreground z-50 flex flex-col items-center justify-center text-center"
+      className="fixed size-full top-0 left-0 bg-background/100 text-foreground z-50 flex flex-col items-center justify-center text-center"
       style={{ pointerEvents: loaded ? "none" : "auto" }}
       ref={ref}
       onClick={() => {

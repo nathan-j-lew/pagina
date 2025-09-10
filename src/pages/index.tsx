@@ -78,7 +78,7 @@ export default function Home({
             {loaded && (
               <div className="flex flex-col justify-center items-center h-full">
                 <div
-                  className="flex flex-col items-center justify-stretch gap-2 aspect-55/89 object-contain my-auto overflow-hidden"
+                  className="flex flex-col items-center justify-stretch gap-1 aspect-55/89 object-contain my-auto overflow-hidden "
                   style={{
                     width:
                       "min(calc(100vw - (1rem * 55 / 89)), calc((55 * (100vh - 1rem) / 89)))",
@@ -92,13 +92,13 @@ export default function Home({
                       className="block aspect-square max-w-[40rem] max-h-[40rem] bg-blend-difference object-contain"
                       style={{
                         backgroundColor: data[currentItem.display].hex,
-                        border: "1px solid var(--foreground)",
+                        // border: "1px solid var(--foreground)",
                       }}
                       layoutId="background"
                     />
                   </Link>
                   <motion.div
-                    className="w-full h-full flex relative gap-2"
+                    className="w-full h-full flex relative gap-1"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
@@ -113,7 +113,13 @@ export default function Home({
                     {data.map((_, j) => (
                       <Link
                         key={`item-${j}`}
-                        className={`flex-1 border border-foreground relative`}
+                        className={`flex-1 relative flex flex-col justify-end`}
+                        style={{
+                          background:
+                            j === currentItem.display
+                              ? "transparent"
+                              : "var(--foreground)",
+                        }}
                         href={`#${data[j].slug}`}
                         onPointerEnter={() => {
                           // playSprite({ id: (j + 1).toString() });
@@ -126,17 +132,43 @@ export default function Home({
                           });
                         }}
                       >
-                        <span className="absolute h-full w-full -translate-1/2 top-1/2 left-1/2 any-pointer-fine:hidden" />
+                        <span
+                          className="text-2xl p-1"
+                          style={{
+                            color:
+                              j === currentItem.display
+                                ? "var(--foreground)"
+                                : "var(--background)",
+                          }}
+                        >
+                          {j + 1}
+                        </span>
+                        {/* <span className="absolute h-full w-full -translate-1/2 top-1/2 left-1/2 any-pointer-fine:hidden" /> */}
                       </Link>
                     ))}
-                    <motion.div
-                      className={`bg-foreground absolute h-full w-[calc((100%-2rem)/5)]`}
-                      style={{
-                        x: `calc(${currentItem.display * 100}% + ${
-                          currentItem.display * 0.5
-                        }rem)`,
-                      }}
-                    />
+                    {currentItem.display > 0 && (
+                      <motion.div
+                        className={`border-4 border-foreground absolute h-full pointer-events-none -z-1`}
+                        style={{
+                          width: `calc(${currentItem.display - 1} * 0.25rem + ${
+                            currentItem.display
+                          } * (100% - 1rem)/5)`,
+                        }}
+                      />
+                    )}
+                    {currentItem.display < 4 && (
+                      <motion.div
+                        className={`border-4 border-foreground absolute h-full pointer-events-none -z-1`}
+                        style={{
+                          right: 0,
+                          width: `calc(${
+                            5 - currentItem.display - 2
+                          } * 0.25rem + ${
+                            5 - currentItem.display - 1
+                          } * (100% - 1rem)/5)`,
+                        }}
+                      />
+                    )}
                   </motion.div>
                 </div>
               </div>
