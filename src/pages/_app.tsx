@@ -40,15 +40,22 @@ export default function App({ Component, pageProps }: AppProps) {
     { x: null, y: null },
   ]);
 
+  // const lenis = useLenis((lenis) => {
+  //   console.log("lenis inside _app", lenis.isHorizontal);
+  //   lenis.start();
+  // });
+
   const updateSize = () => {
     if (typeof window !== "undefined") {
       setSize({ width: window.innerWidth, height: window.innerHeight });
+      // console.log(lenis);
     }
   };
 
   useEffect(() => {
     updateSize();
     window.addEventListener("resize", updateSize);
+
     return () => {
       window.removeEventListener("resize", updateSize);
     };
@@ -116,10 +123,17 @@ export default function App({ Component, pageProps }: AppProps) {
   return (
     <Fragment>
       <ResizeContext value={{ size: { width: 0, height: 0 } }}>
-        <div className="fixed top-0 right-0">
-          {size.width}, {size.height}
+        <div className="fixed top-0 right-0 portrait:bg-red-500 bg-green-500">
+          {size.width > size.height ? "Landscape" : "Portrait"}
         </div>
-        <ReactLenis root options={{ syncTouch: true }} />
+        <ReactLenis
+          root
+          options={{
+            syncTouch: true,
+            // gestureOrientation: "both",
+            orientation: size.width < size.height ? "horizontal" : "vertical",
+          }}
+        />
         <MousePositionContext
           value={{ position: mousePosition, clicked: clicked, taps: taps }}
         >
