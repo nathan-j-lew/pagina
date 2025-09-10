@@ -11,7 +11,7 @@ import { getSortedSpreadsData } from "@/lib/spreads";
 import { useLenis } from "lenis/react";
 import useSound from "use-sound";
 import { Loader } from "@/components/loader/loader";
-import { LoaderContext } from "@/context/Loader/Loader";
+import { LoaderContext } from "@/context/Loader/LoaderContext";
 // import dial from "@/assets/audio/dial.mp3";
 
 const libreBodoni = Libre_Bodoni({

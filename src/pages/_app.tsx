@@ -1,11 +1,12 @@
 import "@/styles/globals.css";
 import type { AppProps } from "next/app";
-import { MousePositionContext } from "@/context/MousePosition/MousePosition";
-import { LoaderContext } from "@/context/Loader/Loader";
+import { MousePositionContext } from "@/context/MousePosition/MousePositionContext";
+import { LoaderContext } from "@/context/Loader/LoaderContext";
 import { useState, useEffect, Fragment } from "react";
 import ReactLenis from "lenis/react";
 import { Loader } from "@/components/loader/loader";
 import localFont from "next/font/local";
+import { ResizeContext } from "@/context/Resize/ResizeContext";
 
 const pizzi = localFont({
   src: [
@@ -16,6 +17,7 @@ const pizzi = localFont({
 });
 
 export default function App({ Component, pageProps }: AppProps) {
+  const [size, setSize] = useState({ width: 0, height: 0 });
   const [loaded, setLoaded] = useState(false);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [clicked, setClicked] = useState<{
@@ -37,6 +39,20 @@ export default function App({ Component, pageProps }: AppProps) {
     { x: null, y: null },
     { x: null, y: null },
   ]);
+
+  const updateSize = () => {
+    if (typeof window !== "undefined") {
+      setSize({ width: window.innerWidth, height: window.innerHeight });
+    }
+  };
+
+  useEffect(() => {
+    updateSize();
+    window.addEventListener("resize", updateSize);
+    return () => {
+      window.removeEventListener("resize", updateSize);
+    };
+  }, []);
 
   useEffect(() => {
     const updateMousePosition = (e: MouseEvent) => {
@@ -99,19 +115,24 @@ export default function App({ Component, pageProps }: AppProps) {
 
   return (
     <Fragment>
-      <ReactLenis root options={{ syncTouch: true }} />
-      <MousePositionContext
-        value={{ position: mousePosition, clicked: clicked, taps: taps }}
-      >
-        <LoaderContext value={{ loaded: loaded }}>
-          <div
-            className={`${pizzi.variable} font-sans scrollbar-gutter-stable`}
-          >
-            <Loader loaded={loaded} handler={() => setLoaded(true)} />
-            <Component {...pageProps} />
-          </div>
-        </LoaderContext>
-      </MousePositionContext>
+      <ResizeContext value={{ size: { width: 0, height: 0 } }}>
+        <div className="fixed top-0 right-0">
+          {size.width}, {size.height}
+        </div>
+        <ReactLenis root options={{ syncTouch: true }} />
+        <MousePositionContext
+          value={{ position: mousePosition, clicked: clicked, taps: taps }}
+        >
+          <LoaderContext value={{ loaded: loaded }}>
+            <div
+              className={`${pizzi.variable} font-sans scrollbar-gutter-stable`}
+            >
+              <Loader loaded={loaded} handler={() => setLoaded(true)} />
+              <Component {...pageProps} />
+            </div>
+          </LoaderContext>
+        </MousePositionContext>
+      </ResizeContext>
     </Fragment>
   );
 }

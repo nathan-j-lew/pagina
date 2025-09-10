@@ -15,7 +15,7 @@ import {
   useState,
 } from "react";
 import { trunc } from "@/lib/utils";
-import { MousePositionContext } from "@/context/MousePosition/MousePosition";
+import { MousePositionContext } from "@/context/MousePosition/MousePositionContext";
 import { useLenis } from "lenis/react";
 
 export const ScrollIndicator = ({
