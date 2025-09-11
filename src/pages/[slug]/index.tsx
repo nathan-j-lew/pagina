@@ -14,6 +14,7 @@ import { CloudinaryResource } from "@cloudinary-util/types";
 import cloudinary from "@/lib/cloudinary";
 import { Fragment, useContext, useEffect, useRef, useState } from "react";
 import { ScrollContext } from "@/context/Scroll/ScrollContext";
+import { Lenis, useLenis } from "lenis/react";
 
 const libreBodoni = Libre_Bodoni({
   variable: "--font-libre-bodoni",
@@ -36,6 +37,10 @@ export default function Page({
     blurDataURL?: string;
   }[];
 }) {
+  const lenis = useLenis();
+  useEffect(() => {
+    lenis?.scrollTo(0, { immediate: true });
+  }, []);
   const scrollContext = useContext(ScrollContext);
   // const [divRef, setDivRef] = useState<LenisRef | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);

@@ -48,16 +48,7 @@ export default function Home({
     }
   }, [scrollContext]);
 
-  const lenis = useLenis((lenis) => {
-    // if (dragConstraintsRef.current && thumbRef.current && !dragging) {
-    //   console.log(lenis.progress);
-    //   dragPos.jump(
-    //     lenis.progress *
-    //       (dragConstraintsRef.current.clientWidth -
-    //         thumbRef.current.clientWidth)
-    //   );
-    // }
-  });
+  const lenis = useLenis((lenis) => {});
   const [dragging, setDragging] = useState(false);
 
   const { scrollXProgress, scrollYProgress } = useScroll({
@@ -92,6 +83,10 @@ export default function Home({
   });
 
   useEffect(() => {
+    if (lenis) {
+      console.log(currentItem.display, data.length);
+      dragPos.jump((currentItem.display / (data.length - 1)) * dragWidth);
+    }
     playSprite({
       id: (currentItem.display + 1).toString(),
     });
@@ -129,7 +124,7 @@ export default function Home({
       //   original: index >= data.length ? data.length - 1 : index,
       //   display: index >= data.length ? data.length - 1 : index,
       // });
-      lenis?.scrollTo((lenis?.limit ? lenis.limit : 0) * (latest / width), {
+      lenis?.scrollTo(lenis?.limit * progress, {
         immediate: true,
       });
     }
@@ -269,6 +264,12 @@ export default function Home({
                         modifyTarget: (target) =>
                           Math.round((target / dragWidth) * 4) *
                           (dragWidth / 4),
+                      }}
+                      onDragStart={() => {
+                        setDragging(true);
+                      }}
+                      onDragEnd={() => {
+                        setDragging(false);
                       }}
                       style={{
                         // touchAction: "none",
