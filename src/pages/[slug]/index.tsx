@@ -76,7 +76,7 @@ export default function Page({
   return (
     <Fragment>
       <motion.main
-        className="flex max-sm:portrait:bg-gradient-to-r from-red-500 to-blue-500 flex-col items-center relative"
+        className="flex flex-col items-center relative"
         style={{
           width: images.length > 0 ? images.length * 100 + "vw" : "100vw",
           height: images.length > 0 ? images.length * 50 + "vh" : "100vh",

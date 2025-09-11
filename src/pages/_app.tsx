@@ -45,13 +45,6 @@ export default function App({ Component, pageProps }: AppProps) {
     { x: null, y: null },
   ]);
 
-  const lenis = useLenis();
-
-  // const lenis = useLenis((lenis) => {
-  //   console.log("lenis inside _app", lenis.isHorizontal);
-  //   lenis.start();
-  // });
-
   const updateSize = () => {
     if (typeof window !== "undefined") {
       setResize({

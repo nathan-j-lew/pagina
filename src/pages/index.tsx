@@ -37,18 +37,21 @@ export default function Home({
   data: { title: string; hex: string; slug: string; order: number }[];
 }) {
   const scrollContext = useContext(ScrollContext);
-  // const [divRef, setDivRef] = useState<LenisRef | null>(null);
+
   const scrollRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
-    // console.log("scrollContext", scrollContext);
     if (scrollContext != null) {
       console.log("scrollContext", scrollContext);
-      // setDivRef(scrollContext.current);
       scrollRef.current = scrollContext.current?.wrapper || null;
     }
   }, [scrollContext]);
 
-  const lenis = useLenis((lenis) => {});
+  const lenis = useLenis((lenis) => {
+    console.log(lenis.isScrolling);
+    console.log(lenis.isSmooth);
+    console.log(lenis.velocity);
+  });
+
   const [dragging, setDragging] = useState(false);
 
   const { scrollXProgress, scrollYProgress } = useScroll({
@@ -68,8 +71,6 @@ export default function Home({
       display: index >= data.length ? data.length - 1 : index,
     });
     if (!dragConstraintsRef.current) return;
-    const width = dragConstraintsRef.current.clientWidth;
-    // dragPos.jump(index);
   });
 
   useMotionValueEvent(scrollYProgress, "change", (latest) => {
@@ -84,7 +85,7 @@ export default function Home({
 
   useEffect(() => {
     if (lenis) {
-      console.log(currentItem.display, data.length);
+      // console.log(currentItem.display, data.length);
       dragPos.jump((currentItem.display / (data.length - 1)) * dragWidth);
     }
     playSprite({
@@ -105,25 +106,13 @@ export default function Home({
   const dragPos = useMotionValue(0);
 
   useMotionValueEvent(dragPos, "change", (latest) => {
-    // console.log("dragPos", latest);
-    // console.log(
-    //   dragConstraintsRef.current ? dragConstraintsRef.current.clientWidth : 0
-    // );
     if (!dragConstraintsRef.current || !thumbRef.current) return;
     const width =
       dragConstraintsRef.current.clientWidth - thumbRef.current.clientWidth;
-    // const index = Math.floor((latest / width) * data.length);
-    // console.log("width", width);
-    // console.log("latest / width", latest / width);
-    // console.log((lenis?.limit ? lenis.limit * latest : 0) / width);
+
     const progress = latest / width;
-    const index = Math.floor(progress * data.length);
 
     if (dragging) {
-      // setCurrentItem({
-      //   original: index >= data.length ? data.length - 1 : index,
-      //   display: index >= data.length ? data.length - 1 : index,
-      // });
       lenis?.scrollTo(lenis?.limit * progress, {
         immediate: true,
       });
@@ -131,7 +120,6 @@ export default function Home({
   });
 
   const size = useContext(ResizeContext);
-  const controls = useDragControls();
 
   const dragConstraintsRef = useRef<HTMLDivElement>(null);
   const thumbRef = useRef<HTMLDivElement>(null);
@@ -145,9 +133,16 @@ export default function Home({
   }, [dragConstraintsRef.current, thumbRef.current]);
 
   useEffect(() => {
+    if (loaded) {
+      lenis?.scrollTo(0, { immediate: true });
+      setCurrentItem({ original: 0, display: 0 });
+    }
+  }, [loaded]);
+
+  useEffect(() => {
     if (dragConstraintsRef.current) {
-      console.log(dragConstraintsRef.current.clientLeft);
-      console.log(dragPos.get());
+      // console.log(dragConstraintsRef.current.clientLeft);
+      // console.log(dragPos.get());
     }
   }, [currentItem.display]);
 
@@ -193,7 +188,7 @@ export default function Home({
                     ref={dragConstraintsRef}
                   >
                     {data.map((_, j) => (
-                      <Link
+                      <div
                         key={`item-${j}`}
                         className={`flex-1 relative flex flex-col justify-end`}
                         style={{
@@ -204,9 +199,13 @@ export default function Home({
                           pointerEvents:
                             j === currentItem.display ? "none" : "auto",
                         }}
-                        href={`#${data[j].slug}`}
+                        // href={`#${data[j].slug}`}
                         onMouseEnter={() => {
-                          if (size.size.width >= 640) {
+                          if (
+                            size.size.width >= 640 &&
+                            lenis &&
+                            Math.abs(lenis?.velocity) < 20
+                          ) {
                             setCurrentItem({
                               ...currentItem,
                               display: j,
@@ -229,7 +228,7 @@ export default function Home({
                           {j + 1}
                         </span>
                         {/* <span className="absolute h-full w-full -translate-1/2 top-1/2 left-1/2 any-pointer-fine:hidden" /> */}
-                      </Link>
+                      </div>
                     ))}
                     {currentItem.display > 0 && (
                       <motion.div
@@ -242,7 +241,7 @@ export default function Home({
                       />
                     )}
                     <motion.div
-                      data-lenis-prevent
+                      // data-lenis-prevent
                       className={`w-[calc((100%-1rem)/5)] absolute h-full z-10 flex items-center justify-center bg-red-500/10`}
                       drag="x"
                       dragConstraints={{
@@ -262,8 +261,8 @@ export default function Home({
                         power: 0,
                         // timeConstant: 0.3,
                         modifyTarget: (target) =>
-                          Math.round((target / dragWidth) * 4) *
-                          (dragWidth / 4),
+                          Math.round((target / dragWidth) * (data.length - 1)) *
+                          (dragWidth / (data.length - 1)),
                       }}
                       onDragStart={() => {
                         setDragging(true);
@@ -272,18 +271,14 @@ export default function Home({
                         setDragging(false);
                       }}
                       style={{
-                        // touchAction: "none",
+                        touchAction: "none",
                         x: dragPos,
-                        // x: `calc(${currentItem.display} * ((100% - 1rem)/5) + ${currentItem.display} * 0.25rem)`,
-                        // width: `calc(${currentItem.display} * 0.25rem + ${
-                        //   currentItem.display + 1
-                        // } * (100% - 1rem)/5)`,
                       }}
                       ref={thumbRef}
                     >
                       <div className="size-4 rounded-full bg-red-500" />
                     </motion.div>
-                    {currentItem.display < 4 && (
+                    {currentItem.display < data.length - 1 && (
                       <motion.div
                         className={`border-4 border-foreground absolute h-full pointer-events-none -z-1`}
                         style={{
