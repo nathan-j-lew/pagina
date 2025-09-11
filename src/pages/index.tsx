@@ -26,7 +26,7 @@ export default function Home({
 }) {
   const lenis = useLenis();
 
-  const { scrollYProgress } = useScroll();
+  const { scrollXProgress, scrollYProgress } = useScroll();
 
   const [currentItem, setCurrentItem] = useState({
     original: 0,
@@ -34,6 +34,15 @@ export default function Home({
   });
 
   const [currentAudio, setCurrentAudio] = useState(1);
+
+  useMotionValueEvent(scrollXProgress, "change", (latest) => {
+    const index = Math.floor(latest * data.length);
+    if (latest < 0.01) return;
+    setCurrentItem({
+      original: index >= data.length ? data.length - 1 : index,
+      display: index >= data.length ? data.length - 1 : index,
+    });
+  });
 
   useMotionValueEvent(scrollYProgress, "change", (latest) => {
     const index = Math.floor(latest * data.length);
@@ -69,7 +78,7 @@ export default function Home({
           <Link href="/image">Test</Link>
         </div>
       </nav>
-      <motion.main className="flex flex-col items-center relative">
+      <motion.main className="items-center relative max-sm:max-h-lvh flex flex-col max-sm:portrait:flex-row w-max">
         <motion.section
           className="fixed left-0 top-0 w-full h-dvh py-2 flex flex-col overflow-hidden"
           layoutScroll
@@ -77,13 +86,7 @@ export default function Home({
           <AnimatePresence>
             {loaded && (
               <div className="flex flex-col justify-center items-center h-full">
-                <div
-                  className="flex flex-col items-center justify-stretch gap-1 aspect-55/89 object-contain my-auto overflow-hidden "
-                  style={{
-                    width:
-                      "min(calc(100vw - (1rem * 55 / 89)), calc((55 * (100vh - 1rem) / 89)))",
-                  }}
-                >
+                <div className="flex flex-col max-sm:landscape:flex-row items-center justify-stretch gap-1 aspect-[1/sqrt(2)] max-sm:landscape:aspect-[sqrt(2)/1] w-[min(100vw,calc(100vh/sqrt(2)))] max-sm:landscape:w-[min(100vw,calc(100vh*sqrt(2)))] object-contain my-auto overflow-hidden ">
                   <Link
                     href={data[currentItem.display].slug}
                     className="w-full object-contain"
@@ -102,13 +105,6 @@ export default function Home({
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
-                    // onMouseLeave={() => {
-                    //   setCurrentItem((original) => ({
-                    //     original: original.original,
-                    //     display: original.original,
-                    //   }));
-                    //   lenis?.scrollTo(`#${data[currentItem.original].slug}`);
-                    // }}
                   >
                     {data.map((_, j) => (
                       <Link
@@ -121,8 +117,7 @@ export default function Home({
                               : "var(--foreground)",
                         }}
                         href={`#${data[j].slug}`}
-                        onPointerEnter={() => {
-                          // playSprite({ id: (j + 1).toString() });
+                        onMouseEnter={() => {
                           setCurrentItem({
                             ...currentItem,
                             display: j,
@@ -178,7 +173,7 @@ export default function Home({
         {data.map((item, i) => (
           <section
             key={`section--${i}`}
-            className="w-full h-lvh min-h-[36rem]"
+            className="min-w-screen h-lvh min-h-[36rem]"
             id={item.slug}
           />
         ))}

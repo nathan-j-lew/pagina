@@ -3,10 +3,10 @@ import type { AppProps } from "next/app";
 import { MousePositionContext } from "@/context/MousePosition/MousePositionContext";
 import { LoaderContext } from "@/context/Loader/LoaderContext";
 import { useState, useEffect, Fragment } from "react";
-import ReactLenis from "lenis/react";
+import ReactLenis, { useLenis } from "lenis/react";
 import { Loader } from "@/components/loader/loader";
 import localFont from "next/font/local";
-import { ResizeContext } from "@/context/Resize/ResizeContext";
+import { ResizeContext, ResizeInfo } from "@/context/Resize/ResizeContext";
 
 const pizzi = localFont({
   src: [
@@ -17,7 +17,11 @@ const pizzi = localFont({
 });
 
 export default function App({ Component, pageProps }: AppProps) {
-  const [size, setSize] = useState({ width: 0, height: 0 });
+  const [resize, setResize] = useState<ResizeInfo>({
+    size: { width: 0, height: 0 },
+    orientation: "vertical",
+  });
+
   const [loaded, setLoaded] = useState(false);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [clicked, setClicked] = useState<{
@@ -40,6 +44,8 @@ export default function App({ Component, pageProps }: AppProps) {
     { x: null, y: null },
   ]);
 
+  const lenis = useLenis();
+
   // const lenis = useLenis((lenis) => {
   //   console.log("lenis inside _app", lenis.isHorizontal);
   //   lenis.start();
@@ -47,13 +53,19 @@ export default function App({ Component, pageProps }: AppProps) {
 
   const updateSize = () => {
     if (typeof window !== "undefined") {
-      setSize({ width: window.innerWidth, height: window.innerHeight });
+      setResize({
+        size: { width: window.innerWidth, height: window.innerHeight },
+        orientation:
+          window.innerWidth > window.innerHeight ? "horizontal" : "vertical",
+      });
+      setLoaded(false);
       // console.log(lenis);
     }
   };
 
   useEffect(() => {
     updateSize();
+
     window.addEventListener("resize", updateSize);
 
     return () => {
@@ -122,30 +134,43 @@ export default function App({ Component, pageProps }: AppProps) {
 
   return (
     <Fragment>
-      <ResizeContext value={{ size: { width: 0, height: 0 } }}>
-        <div className="fixed top-0 right-0 portrait:bg-red-500 bg-green-500">
-          {size.width > size.height ? "Landscape" : "Portrait"}
+      <ResizeContext
+        value={{ size: resize.size, orientation: resize.orientation }}
+      >
+        <div className="fixed z-100 top-0 right-0 portrait:bg-red-500 bg-green-500">
+          <div>
+            {resize.size.width > resize.size.height ? "Landscape" : "Portrait"}
+          </div>
+          <div>{resize.orientation}</div>
         </div>
         <ReactLenis
           root
           options={{
             syncTouch: true,
             // gestureOrientation: "both",
-            orientation: size.width < size.height ? "horizontal" : "vertical",
+            gestureOrientation:
+              resize.size.width > resize.size.height || resize.size.width > 640
+                ? "vertical"
+                : "horizontal",
+            orientation:
+              resize.size.width > resize.size.height || resize.size.width > 640
+                ? "vertical"
+                : "horizontal",
           }}
-        />
-        <MousePositionContext
-          value={{ position: mousePosition, clicked: clicked, taps: taps }}
         >
-          <LoaderContext value={{ loaded: loaded }}>
-            <div
-              className={`${pizzi.variable} font-sans scrollbar-gutter-stable`}
-            >
-              <Loader loaded={loaded} handler={() => setLoaded(true)} />
-              <Component {...pageProps} />
-            </div>
-          </LoaderContext>
-        </MousePositionContext>
+          <MousePositionContext
+            value={{ position: mousePosition, clicked: clicked, taps: taps }}
+          >
+            <LoaderContext value={{ loaded: loaded }}>
+              <div
+                className={`${pizzi.variable} font-sans scrollbar-gutter-stable`}
+              >
+                <Loader loaded={loaded} handler={() => setLoaded(true)} />
+                <Component {...pageProps} />
+              </div>
+            </LoaderContext>
+          </MousePositionContext>
+        </ReactLenis>
       </ResizeContext>
     </Fragment>
   );

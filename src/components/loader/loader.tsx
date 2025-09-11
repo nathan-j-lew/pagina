@@ -22,12 +22,13 @@ export const Loader = ({
 
   useEffect(() => {
     lenis?.stop();
-    console.log(lenis);
+    // console.log(lenis?.isHorizontal);
   }, [lenis]);
 
   const closeModal = () => {
     // if (ref.current) {
     lenis?.start();
+    console.log(lenis?.isHorizontal);
 
     handler();
     // }
