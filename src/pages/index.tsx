@@ -46,11 +46,7 @@ export default function Home({
     }
   }, [scrollContext]);
 
-  const lenis = useLenis((lenis) => {
-    console.log(lenis.isScrolling);
-    console.log(lenis.isSmooth);
-    console.log(lenis.velocity);
-  });
+  const lenis = useLenis();
 
   const [dragging, setDragging] = useState(false);
 
