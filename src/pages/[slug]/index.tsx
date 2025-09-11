@@ -8,11 +8,12 @@ import {
 } from "motion/react";
 import Link from "next/link";
 import { getSpreadData, getSpreadSlugs } from "@/lib/spreads";
-import { ScrollIndicator } from "@/components/scroll/scroll";
+import { ScrollIndicator } from "@/components/scroll/scroll_old-1";
 import { CldImage, getCldImageUrl } from "next-cloudinary";
 import { CloudinaryResource } from "@cloudinary-util/types";
 import cloudinary from "@/lib/cloudinary";
-import { Fragment, useState } from "react";
+import { Fragment, useContext, useEffect, useRef, useState } from "react";
+import { ScrollContext } from "@/context/Scroll/ScrollContext";
 
 const libreBodoni = Libre_Bodoni({
   variable: "--font-libre-bodoni",
@@ -35,13 +36,33 @@ export default function Page({
     blurDataURL?: string;
   }[];
 }) {
-  const { scrollYProgress } = useScroll();
+  const scrollContext = useContext(ScrollContext);
+  // const [divRef, setDivRef] = useState<LenisRef | null>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    // console.log("scrollContext", scrollContext);
+    if (scrollContext != null) {
+      console.log("scrollContext", scrollContext);
+      // setDivRef(scrollContext.current);
+      scrollRef.current = scrollContext.current?.wrapper || null;
+    }
+  }, [scrollContext]);
+
+  const { scrollXProgress, scrollYProgress } = useScroll({
+    container: scrollRef,
+  });
+
   const mix = useTransform(
     scrollYProgress,
     [0, 1],
     [spreadData.hex, "#888888"]
   );
   const [currentItem, setCurrentItem] = useState(0);
+  useMotionValueEvent(scrollXProgress, "change", (latest) => {
+    const index = Math.floor(latest * images.length);
+    if (latest < 0.01) return;
+    setCurrentItem(index >= images.length ? images.length - 1 : index);
+  });
   useMotionValueEvent(scrollYProgress, "change", (latest) => {
     const index = Math.floor(latest * images.length);
     if (latest < 0.01) return;
@@ -50,8 +71,9 @@ export default function Page({
   return (
     <Fragment>
       <motion.main
-        className="flex flex-col items-center relative"
+        className="flex max-sm:portrait:bg-gradient-to-r from-red-500 to-blue-500 flex-col items-center relative"
         style={{
+          width: images.length > 0 ? images.length * 100 + "vw" : "100vw",
           height: images.length > 0 ? images.length * 50 + "vh" : "100vh",
         }}
       >
@@ -105,7 +127,10 @@ export default function Page({
             <ChevronLeft className="fill-foreground size-6" /> Back to home
           </Link>
         </motion.div>
-        <ScrollIndicator scrollYProgress={scrollYProgress} />
+        <ScrollIndicator
+          scrollXProgress={scrollXProgress}
+          scrollYProgress={scrollYProgress}
+        />
       </motion.main>
     </Fragment>
   );

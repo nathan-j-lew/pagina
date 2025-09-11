@@ -2,10 +2,11 @@ import "@/styles/globals.css";
 import type { AppProps } from "next/app";
 import { MousePositionContext } from "@/context/MousePosition/MousePositionContext";
 import { LoaderContext } from "@/context/Loader/LoaderContext";
-import { useState, useEffect, Fragment } from "react";
-import ReactLenis, { useLenis } from "lenis/react";
+import { useState, useEffect, Fragment, useRef } from "react";
+import ReactLenis, { LenisRef, useLenis } from "lenis/react";
 import { Loader } from "@/components/loader/loader";
 import localFont from "next/font/local";
+import { ScrollContext } from "@/context/Scroll/ScrollContext";
 import { ResizeContext, ResizeInfo } from "@/context/Resize/ResizeContext";
 
 const pizzi = localFont({
@@ -128,6 +129,8 @@ export default function App({ Component, pageProps }: AppProps) {
     };
   }, []);
 
+  const ref = useRef<LenisRef>(null);
+
   // useEffect(() => {
   //   console.log(taps);
   // }, [taps]);
@@ -143,34 +146,38 @@ export default function App({ Component, pageProps }: AppProps) {
           </div>
           <div>{resize.orientation}</div>
         </div>
-        <ReactLenis
-          root
-          options={{
-            syncTouch: true,
-            // gestureOrientation: "both",
-            gestureOrientation:
-              resize.size.width > resize.size.height || resize.size.width > 640
-                ? "vertical"
-                : "horizontal",
-            orientation:
-              resize.size.width > resize.size.height || resize.size.width > 640
-                ? "vertical"
-                : "horizontal",
-          }}
-        >
-          <MousePositionContext
-            value={{ position: mousePosition, clicked: clicked, taps: taps }}
+        <ScrollContext value={ref}>
+          <ReactLenis
+            options={{
+              syncTouch: true,
+              gestureOrientation:
+                resize.size.width > resize.size.height ||
+                resize.size.width > 640
+                  ? "vertical"
+                  : "horizontal",
+              orientation:
+                resize.size.width > resize.size.height ||
+                resize.size.width > 640
+                  ? "vertical"
+                  : "horizontal",
+            }}
+            className="w-screen h-svh overflow-x-auto overflow-y-hidden sm:overflow-y-auto sm:overflow-x-hidden"
+            ref={ref}
           >
-            <LoaderContext value={{ loaded: loaded }}>
-              <div
-                className={`${pizzi.variable} font-sans scrollbar-gutter-stable`}
-              >
-                <Loader loaded={loaded} handler={() => setLoaded(true)} />
-                <Component {...pageProps} />
-              </div>
-            </LoaderContext>
-          </MousePositionContext>
-        </ReactLenis>
+            <MousePositionContext
+              value={{ position: mousePosition, clicked: clicked, taps: taps }}
+            >
+              <LoaderContext value={{ loaded: loaded }}>
+                <div
+                  className={`${pizzi.variable} font-sans scrollbar-gutter-stable`}
+                >
+                  <Loader loaded={loaded} handler={() => setLoaded(true)} />
+                  <Component {...pageProps} />
+                </div>
+              </LoaderContext>
+            </MousePositionContext>
+          </ReactLenis>
+        </ScrollContext>
       </ResizeContext>
     </Fragment>
   );

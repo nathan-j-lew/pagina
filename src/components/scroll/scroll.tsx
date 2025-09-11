@@ -17,12 +17,16 @@ import {
 import { trunc } from "@/lib/utils";
 import { MousePositionContext } from "@/context/MousePosition/MousePositionContext";
 import { useLenis } from "lenis/react";
+import { ResizeContext } from "@/context/Resize/ResizeContext";
 
 export const ScrollIndicator = ({
+  scrollXProgress,
   scrollYProgress,
 }: {
+  scrollXProgress: MotionValue;
   scrollYProgress: MotionValue;
 }) => {
+  const { orientation } = useContext(ResizeContext);
   const lenis = useLenis(() => {});
   const mousePosition = useContext(MousePositionContext);
   const angle = useMotionValue(0);
@@ -54,11 +58,15 @@ export const ScrollIndicator = ({
     damping: 15,
   });
 
-  useMotionValueEvent(scrollYProgress, "change", (latest) => {
-    console.log("scrollYProgress", latest);
-  });
+  // useMotionValueEvent(scrollYProgress, "change", (latest) => {
+  //   console.log("scrollYProgress", latest);
+  // });
 
   const circumference = 2 * Math.PI * 16;
+
+  const clampedScrollXProgress = useTransform(scrollXProgress, [0, 1], [0, 1], {
+    clamp: true,
+  });
 
   const clampedScrollYProgress = useTransform(scrollYProgress, [0, 1], [0, 1], {
     clamp: true,
@@ -66,11 +74,19 @@ export const ScrollIndicator = ({
 
   const scrollAngle = useTransform(scrollYProgress, [0, 1], [0, 360]);
 
-  const strokeDashoffset = useTransform(
+  const strokeDashoffsetX = useTransform(
+    clampedScrollXProgress,
+    (value) => circumference * (1 - value)
+  );
+  const strokeDashoffsetY = useTransform(
     clampedScrollYProgress,
     (value) => circumference * (1 - value)
   );
-  const testOffset = useSpring(strokeDashoffset, {
+  const testOffsetX = useSpring(strokeDashoffsetX, {
+    stiffness: 100,
+    damping: 25,
+  });
+  const testOffsetY = useSpring(strokeDashoffsetY, {
     stiffness: 100,
     damping: 25,
   });
@@ -185,7 +201,7 @@ export const ScrollIndicator = ({
       ) {
         console.log(dist);
         const test = trunc(
-          scrollYProgress.get() +
+          (lenis ? lenis.progress : 0) +
             dot.angle *
               (dot.det > 0 ? 1 : -1) *
               (mousePosition.taps[0].x !== null ? 0.2 : 0.2)
@@ -193,12 +209,9 @@ export const ScrollIndicator = ({
         angle.set(
           angle.get() + dot.angle * (dot.det > 0 ? 1 : -1) * Math.PI * 8
         );
-        lenis?.scrollTo(
-          (lenis.dimensions.scrollHeight - lenis.dimensions.height) * test,
-          {
-            immediate: true,
-          }
-        );
+        lenis?.scrollTo(lenis.limit * test, {
+          immediate: true,
+        });
       }
     }
   }, [dot]);
@@ -225,6 +238,7 @@ export const ScrollIndicator = ({
       <div className="fixed bottom-0 inset-x-0 flex flex-col items-center justify-center mb-4 select-none">
         <motion.div
           className="relative flex flex-col items-center justify-center"
+          data-lenis-prevent
           onPointerEnter={() => {
             scale.set(3);
             y.set("-100%");
@@ -270,7 +284,8 @@ export const ScrollIndicator = ({
                 stroke: "var(--foreground)",
                 strokeWidth: 32,
                 strokeDasharray: circumference,
-                strokeDashoffset: testOffset,
+                strokeDashoffset:
+                  orientation === "vertical" ? testOffsetX : testOffsetY,
               }}
             />
           </motion.svg>
