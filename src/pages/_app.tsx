@@ -8,6 +8,7 @@ import { Loader } from "@/components/loader/loader";
 import localFont from "next/font/local";
 import { ScrollContext } from "@/context/Scroll/ScrollContext";
 import { ResizeContext, ResizeInfo } from "@/context/Resize/ResizeContext";
+import { AnimatePresence } from "motion/react";
 
 const pizzi = localFont({
   src: [
@@ -165,6 +166,7 @@ export default function App({ Component, pageProps }: AppProps) {
                   className={`${pizzi.variable} font-sans scrollbar-gutter-stable`}
                 >
                   <Loader loaded={loaded} handler={() => setLoaded(true)} />
+
                   <Component {...pageProps} />
                 </div>
               </LoaderContext>
