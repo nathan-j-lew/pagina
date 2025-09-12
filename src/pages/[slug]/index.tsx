@@ -157,62 +157,71 @@ export async function getStaticProps({ params }: { params: { slug: string } }) {
       notFound: true,
     };
   }
+  try {
+    const results = await cloudinary.v2.search
+      .expression(params.slug)
+      .max_results(16)
+      .execute();
 
-  const results = await cloudinary.v2.search
-    .expression(params.slug)
-    .max_results(16)
-    .execute();
+    const resources: CloudinaryResource[] = results.resources;
 
-  const resources: CloudinaryResource[] = results.resources;
+    const reducedResults: {
+      id: number;
+      height: number;
+      width: number;
+      public_id: string;
+      format: string;
+      blurDataURL?: string;
+    }[] = [];
 
-  const reducedResults: {
-    id: number;
-    height: number;
-    width: number;
-    public_id: string;
-    format: string;
-    blurDataURL?: string;
-  }[] = [];
+    let i = 0;
+    async function getBase64Image(url: string) {
+      const response = await fetch(url);
+      const arrayBuffer = await response.arrayBuffer();
+      const buffer = Buffer.from(arrayBuffer);
+      const base64 = buffer.toString("base64");
+      const dataUrl = `data:${response.type};base64,${base64}`;
+      return dataUrl;
+    }
 
-  let i = 0;
-  async function getBase64Image(url: string) {
-    const response = await fetch(url);
-    const arrayBuffer = await response.arrayBuffer();
-    const buffer = Buffer.from(arrayBuffer);
-    const base64 = buffer.toString("base64");
-    const dataUrl = `data:${response.type};base64,${base64}`;
-    return dataUrl;
-  }
+    for (const result of resources) {
+      const imageUrl = getCldImageUrl({
+        src: result.public_id,
+        width: 100, // Resize the original file to a smaller size
+      });
+      const blurDataUrl = await getBase64Image(imageUrl);
 
-  for (const result of resources) {
-    const imageUrl = getCldImageUrl({
-      src: result.public_id,
-      width: 100, // Resize the original file to a smaller size
+      reducedResults.push({
+        id: i,
+        height: result.height,
+        width: result.width,
+        public_id: result.public_id,
+        format: result.format,
+        blurDataURL: blurDataUrl,
+      });
+      i++;
+    }
+
+    const sortedResults = reducedResults.sort((a, b) => {
+      const val_a = parseInt(a.public_id.split("_")[1]);
+      const val_b = parseInt(b.public_id.split("_")[1]);
+      // console.log(val_b);
+      return val_a - val_b;
     });
-    const blurDataUrl = await getBase64Image(imageUrl);
 
-    reducedResults.push({
-      id: i,
-      height: result.height,
-      width: result.width,
-      public_id: result.public_id,
-      format: result.format,
-      blurDataURL: blurDataUrl,
-    });
-    i++;
+    return {
+      props: {
+        spreadData,
+        images: sortedResults,
+      },
+    };
+  } catch (e) {
+    console.log(e);
   }
-
-  const sortedResults = reducedResults.sort((a, b) => {
-    const val_a = parseInt(a.public_id.split("_")[1]);
-    const val_b = parseInt(b.public_id.split("_")[1]);
-    // console.log(val_b);
-    return val_a - val_b;
-  });
-
   return {
     props: {
       spreadData,
-      images: sortedResults,
+      images: [],
     },
   };
 }
