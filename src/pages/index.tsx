@@ -232,13 +232,15 @@ export default function Home({
                         style={{
                           width: `calc(${currentItem.display - 1} * 0.25rem + ${
                             currentItem.display
-                          } * (100% - 1rem)/5)`,
+                          } * (100% - ${data.length - 1} * 0.25rem)/${
+                            data.length
+                          })`,
                         }}
                       />
                     )}
                     <motion.div
                       // data-lenis-prevent
-                      className={`w-[calc((100%-1rem)/5)] absolute h-full z-10 flex items-center justify-center bg-red-500/10`}
+                      className={`absolute h-full z-10 flex items-center justify-center bg-red-500/10`}
                       drag="x"
                       dragConstraints={{
                         left: 0,
@@ -269,6 +271,9 @@ export default function Home({
                       style={{
                         touchAction: "none",
                         x: dragPos,
+                        width: `calc((100% - ${data.length - 1} * 0.25rem) / ${
+                          data.length
+                        })`,
                       }}
                       ref={thumbRef}
                     >
@@ -280,10 +285,12 @@ export default function Home({
                         style={{
                           right: 0,
                           width: `calc(${
-                            5 - currentItem.display - 2
+                            data.length - currentItem.display - 2
                           } * 0.25rem + ${
-                            5 - currentItem.display - 1
-                          } * (100% - 1rem)/5)`,
+                            data.length - currentItem.display - 1
+                          } * (100% - ${data.length - 1} * 0.25rem)/${
+                            data.length
+                          })`,
                         }}
                       />
                     )}
