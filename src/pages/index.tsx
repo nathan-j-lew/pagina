@@ -154,7 +154,7 @@ export default function Home({
           <Link href="/image">Test</Link>
         </div>
       </nav>
-      <motion.main className="items-center relative max-sm:max-h-svh flex flex-col max-sm:portrait:flex-row w-max bg-gradient-to-r sm:bg-gradient-to-b from-orange-700 to-background">
+      <motion.main className="items-center relative max-sm:max-h-svh flex flex-col max-sm:portrait:flex-row w-max">
         <motion.section
           className="fixed left-0 top-0 w-full h-svh py-2 flex flex-col overflow-hidden"
           layoutScroll
