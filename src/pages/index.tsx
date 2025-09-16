@@ -126,7 +126,7 @@ export default function Home({
       dragConstraintsRef.current.clientWidth -
       (thumbRef.current?.clientWidth || 0)
     );
-  }, [dragConstraintsRef.current, thumbRef.current]);
+  }, [dragConstraintsRef.current, thumbRef.current, size]);
 
   useEffect(() => {
     if (loaded) {
@@ -162,13 +162,13 @@ export default function Home({
           <AnimatePresence>
             {loaded && (
               <div className="flex flex-col justify-center items-center h-full">
-                <div className="flex flex-col max-sm:landscape:flex-row items-center justify-stretch gap-1 aspect-[1/sqrt(2)] max-sm:landscape:aspect-[sqrt(2)/1] w-[min(100vw,calc(100vh/sqrt(2)))] max-sm:landscape:w-[min(100vw,calc(100vh*sqrt(2)))] object-contain my-auto overflow-hidden ">
+                <div className="flex flex-col max-sm:landscape:flex-row items-center justify-stretch gap-1 aspect-[1/sqrt(2)] max-sm:landscape:aspect-[sqrt(2)/1] portrait:w-full portrait:max-w-[calc(100vh/sqrt(2))] landscape:max-h-[calc(100vw/sqrt(2))] landscape:h-full object-contain my-auto overflow-hidden ">
                   <Link
                     href={data[currentItem.display].slug}
-                    className="w-full object-contain"
+                    className="size-full object-contain"
                   >
                     <motion.span
-                      className="block aspect-square max-w-[40rem] max-h-[40rem] bg-blend-difference object-contain"
+                      className="block aspect-square bg-blend-difference object-contain"
                       style={{
                         backgroundColor: data[currentItem.display].hex,
                         // border: "1px solid var(--foreground)",
