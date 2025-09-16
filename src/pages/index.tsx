@@ -144,6 +144,7 @@ export default function Home({
 
   useEffect(() => {
     console.log("dragWidth", dragWidth);
+    // dragPos.set((currentItem.display / (data.length - 1)) * dragWidth);
   }, [dragWidth]);
 
   return (
@@ -162,7 +163,7 @@ export default function Home({
           <AnimatePresence>
             {loaded && (
               <div className="flex flex-col justify-center items-center h-full">
-                <div className="flex flex-col max-sm:landscape:flex-row items-center justify-stretch gap-1 aspect-[1/sqrt(2)] max-sm:landscape:aspect-[sqrt(2)/1] portrait:w-full portrait:max-w-[calc(100vh/sqrt(2))] landscape:max-h-[calc(100vw/sqrt(2))] landscape:h-full object-contain my-auto overflow-hidden ">
+                <div className="flex flex-col max-sm:landscape:flex-row items-center justify-stretch gap-1 aspect-[1/sqrt(2)] max-sm:landscape:aspect-[sqrt(2)/1] portrait:w-full portrait:max-w-[calc(100vh/sqrt(2))] landscape:max-h-[calc(100vw*sqrt(2))] landscape:h-full object-contain my-auto overflow-hidden ">
                   <Link
                     href={data[currentItem.display].slug}
                     className="size-full object-contain"
