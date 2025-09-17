@@ -15,11 +15,7 @@ import cloudinary from "@/lib/cloudinary";
 import { Fragment, useContext, useEffect, useRef, useState } from "react";
 import { ScrollContext } from "@/context/Scroll/ScrollContext";
 import { Lenis, useLenis } from "lenis/react";
-
-const libreBodoni = Libre_Bodoni({
-  variable: "--font-libre-bodoni",
-  subsets: ["latin"],
-});
+import { ResizeContext } from "@/context/Resize/ResizeContext";
 
 export default function Page({
   spreadData,
@@ -37,6 +33,7 @@ export default function Page({
     blurDataURL?: string;
   }[];
 }) {
+  const { orientation, size } = useContext(ResizeContext);
   const lenis = useLenis();
   useEffect(() => {
     lenis?.scrollTo(0, { immediate: true });
@@ -76,18 +73,24 @@ export default function Page({
   return (
     <Fragment>
       <motion.main
-        className="flex flex-col items-center relative"
+        className="flex max-sm:portrait:flex-row flex-col items-center relative"
         style={{
-          width: images.length > 0 ? images.length * 100 + "vw" : "100vw",
-          height: images.length > 0 ? images.length * 50 + "vh" : "100vh",
+          width:
+            images.length > 0 && orientation === "vertical"
+              ? images.length * 100 + "vw"
+              : "100vw",
+          height:
+            images.length > 0 && orientation === "horizontal"
+              ? images.length * 50 + "vh"
+              : "100vh",
         }}
       >
-        <motion.div className="sticky top-0 flex flex-col items-center">
+        <motion.div className="sticky left-0 top-0 w-screen h-svh flex flex-col items-center justify-center">
           {images != undefined &&
             images.map(
               (image, i) =>
                 i == currentItem && (
-                  <div key={image.id} className="m-10">
+                  <div key={image.id} className="m-4">
                     <h2>{image.title}</h2>
                     <p>{image.public_id}</p>
                     <CldImage
