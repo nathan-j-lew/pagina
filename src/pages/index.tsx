@@ -72,7 +72,8 @@ export default function Home({
   });
 
   useMotionValueEvent(scrollYProgress, "change", (latest) => {
-    const index = Math.floor(latest * data.length);
+    const adjust = latest + 1 / ((data.length - 1) * 2);
+    const index = Math.floor(adjust * (data.length - 1));
     console.log("scrollYProgress", latest);
     if (latest < 0.01) return;
     setCurrentItem({
