@@ -60,7 +60,9 @@ export default function Home({
   });
 
   useMotionValueEvent(scrollXProgress, "change", (latest) => {
-    const index = Math.floor(latest * data.length);
+    const adjust = latest + 1 / ((data.length - 1) * 2);
+    const index = Math.floor(adjust * (data.length - 1));
+    console.log("scrollXProgress", latest);
     if (latest < 0) return;
     setCurrentItem({
       original: index >= data.length ? data.length - 1 : index,
@@ -71,6 +73,7 @@ export default function Home({
 
   useMotionValueEvent(scrollYProgress, "change", (latest) => {
     const index = Math.floor(latest * data.length);
+    console.log("scrollYProgress", latest);
     if (latest < 0.01) return;
     setCurrentItem({
       original: index >= data.length ? data.length - 1 : index,
@@ -103,6 +106,7 @@ export default function Home({
 
   useMotionValueEvent(dragPos, "change", (latest) => {
     if (!dragConstraintsRef.current || !thumbRef.current) return;
+
     const width =
       dragConstraintsRef.current.clientWidth - thumbRef.current.clientWidth;
 
@@ -169,7 +173,7 @@ export default function Home({
                     className="size-full object-contain"
                   >
                     <motion.span
-                      className="block aspect-square bg-blend-difference object-contain"
+                      className="flex aspect-square bg-blend-difference object-contain"
                       style={{
                         backgroundColor: data[currentItem.display].hex,
                         // border: "1px solid var(--foreground)",
