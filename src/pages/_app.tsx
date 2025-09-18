@@ -134,12 +134,12 @@ export default function App({ Component, pageProps }: AppProps) {
       <ResizeContext
         value={{ size: resize.size, orientation: resize.orientation }}
       >
-        <div className="fixed z-100 top-0 right-0 portrait:bg-red-500 bg-green-500">
+        {/* <div className="fixed z-100 top-0 right-0 portrait:bg-red-500 bg-green-500">
           <div>
             {resize.size.width > resize.size.height ? "Landscape" : "Portrait"}
           </div>
           <div>{resize.orientation}</div>
-        </div>
+        </div> */}
         <ScrollContext value={ref}>
           <ReactLenis
             options={{
