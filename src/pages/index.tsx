@@ -7,6 +7,7 @@ import {
   useMotionTemplate,
   useMotionValueEvent,
   useScroll,
+  circOut,
 } from "motion/react";
 import {
   Fragment,
@@ -34,7 +35,13 @@ const libreBodoni = Libre_Bodoni({
 export default function Home({
   data,
 }: {
-  data: { title: string; hex: string; slug: string; order: number }[];
+  data: {
+    title: string;
+    hex: string;
+    slug: string;
+    order: number;
+    position: "start" | "end";
+  }[];
 }) {
   const scrollContext = useContext(ScrollContext);
 
@@ -59,79 +66,40 @@ export default function Home({
     display: 0,
   });
 
-  useMotionValueEvent(scrollXProgress, "change", (latest) => {
-    const adjust = latest + 1 / ((data.length - 1) * 2);
-    const index = Math.floor(adjust * (data.length - 1));
-    console.log("scrollXProgress", latest);
-    if (latest < 0) return;
-    setCurrentItem({
-      original: index >= data.length ? data.length - 1 : index,
-      display: index >= data.length ? data.length - 1 : index,
-    });
-    if (!dragConstraintsRef.current) return;
-  });
-
-  useMotionValueEvent(scrollYProgress, "change", (latest) => {
-    const adjust = latest + 1 / ((data.length - 1) * 2);
-    const index = Math.floor(adjust * (data.length - 1));
-    console.log("scrollYProgress", latest);
-    if (latest < 0.01) return;
-    setCurrentItem({
-      original: index >= data.length ? data.length - 1 : index,
-      display: index >= data.length ? data.length - 1 : index,
-    });
-    // dragPos.jump(index);
-  });
-
-  useEffect(() => {
-    if (lenis) {
-      // console.log(currentItem.display, data.length);
-      dragPos.jump((currentItem.display / (data.length - 1)) * dragWidth);
-    }
-    playSprite({
-      id: (currentItem.display + 1).toString(),
-    });
-  }, [currentItem.display]);
-
   const { loaded } = useContext(LoaderContext);
-  const [playSprite] = useSound("/audio/sevenths.mp3", {
-    sprite: {
-      1: [0, 400],
-      2: [500, 400],
-      3: [1000, 400],
-      4: [1500, 400],
-      5: [2000, 400],
-    },
-  });
-  const dragPos = useMotionValue(0);
-
-  useMotionValueEvent(dragPos, "change", (latest) => {
-    if (!dragConstraintsRef.current || !thumbRef.current) return;
-
-    const width =
-      dragConstraintsRef.current.clientWidth - thumbRef.current.clientWidth;
-
-    const progress = latest / width;
-
-    if (dragging) {
-      lenis?.scrollTo(lenis?.limit * progress, {
-        immediate: true,
-      });
-    }
-  });
 
   const size = useContext(ResizeContext);
 
-  const dragConstraintsRef = useRef<HTMLDivElement>(null);
-  const thumbRef = useRef<HTMLDivElement>(null);
-
-  const dragWidth = useMemo(() => {
-    if (!dragConstraintsRef.current || !thumbRef.current) return 0;
-    return (
-      dragConstraintsRef.current.clientWidth -
-      (thumbRef.current?.clientWidth || 0)
-    );
-  }, [dragConstraintsRef.current, thumbRef.current, size]);
+  const bars = {
+    initial: {
+      height: "40%",
+      top: "50%",
+      translateY: "-50%",
+      opacity: 0,
+    },
+    load: (custom: { position: "start" | "end"; index: number }) => ({
+      // height: "40%",
+      // top: "50%",
+      // translateY: "-50%",
+      opacity: 1,
+      transition: {
+        duration: 0.3,
+        ease: circOut,
+        delay: custom.index * 0.1 + 0.5,
+      },
+    }),
+    move: (custom: { position: "start" | "end"; index: number }) => ({
+      top: custom.position === "start" ? 0 : "",
+      bottom: custom.position != "start" ? 0 : "",
+      height: custom.position === "start" ? "40%" : "20%",
+      translateY: "0%",
+      transition: {
+        duration: 0.5,
+        ease: circOut,
+        delay: 1.3,
+      },
+    }),
+  };
 
   useEffect(() => {
     if (loaded) {
@@ -139,18 +107,6 @@ export default function Home({
       setCurrentItem({ original: 0, display: 0 });
     }
   }, [loaded]);
-
-  useEffect(() => {
-    if (dragConstraintsRef.current) {
-      // console.log(dragConstraintsRef.current.clientLeft);
-      // console.log(dragPos.get());
-    }
-  }, [currentItem.display]);
-
-  useEffect(() => {
-    console.log("dragWidth", dragWidth);
-    // dragPos.set((currentItem.display / (data.length - 1)) * dragWidth);
-  }, [dragWidth]);
 
   return (
     <Fragment>
@@ -168,151 +124,62 @@ export default function Home({
           <AnimatePresence>
             {loaded && (
               <div className="flex flex-col justify-center items-center h-full">
-                <div className="flex flex-col max-sm:landscape:flex-row items-center justify-stretch gap-1 aspect-[1/sqrt(2)] max-sm:landscape:aspect-[sqrt(2)/1] portrait:w-full portrait:max-w-[calc(100vh/sqrt(2))] landscape:max-h-[calc(100vw*sqrt(2))] landscape:h-full object-contain my-auto overflow-hidden ">
-                  <Link
-                    href={data[currentItem.display].slug}
-                    className="size-full object-contain"
-                  >
-                    <motion.span
-                      className="flex aspect-square bg-blend-difference object-contain"
-                      style={{
-                        backgroundColor: data[currentItem.display].hex,
-                        // border: "1px solid var(--foreground)",
-                      }}
-                      layoutId="background"
-                    />
-                  </Link>
+                <div className="flex flex-col max-sm:landscape:flex-row items-center justify-stretch gap-1 aspect-square portrait:w-full portrait:max-w-[100vh] landscape:max-h-[100vw] landscape:h-full object-contain my-auto overflow-hidden ">
                   <motion.div
-                    className="w-full h-full flex relative gap-1"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    ref={dragConstraintsRef}
+                    className="border-2 divide-x-2 size-full flex"
+                    // initial={{ opacity: 0 }}
+                    // animate={{ opacity: 1, transition: { delay: 0.5 } }}
+                    initial={{
+                      borderColor: "var(--background)",
+                    }}
+                    animate={{
+                      borderColor: "var(--foreground)",
+                      transition: {
+                        delay: 1.3,
+                        duration: 0.5,
+                        ease: circOut,
+                      },
+                    }}
                   >
-                    {data.map((_, j) => (
-                      <div
-                        key={`item-${j}`}
-                        className={`flex-1 relative flex flex-col justify-end`}
-                        style={{
-                          background:
-                            j === currentItem.display
-                              ? "transparent"
-                              : "var(--foreground)",
-                          pointerEvents:
-                            j === currentItem.display ? "none" : "auto",
+                    {data.map((spread, i) => (
+                      <motion.div
+                        key={spread.slug}
+                        className={`size-full bg-[${spread.hex}] relative`}
+                        initial={{
+                          borderColor: "var(--background)",
                         }}
-                        // href={`#${data[j].slug}`}
-                        onMouseEnter={() => {
-                          if (
-                            size.size.width >= 640 &&
-                            lenis &&
-                            Math.abs(lenis?.velocity) < 20
-                          ) {
-                            setCurrentItem({
-                              ...currentItem,
-                              display: j,
-                            });
-                            lenis?.scrollTo(`#${data[j].slug}`, {
-                              immediate: true,
-                            });
-                          }
+                        animate={{
+                          borderColor: "var(--foreground)",
+                          transition: {
+                            delay: 1.3,
+                            duration: 0.5,
+                            ease: circOut,
+                          },
                         }}
                       >
-                        <span
-                          className="text-2xl p-1"
-                          style={{
-                            color:
-                              j === currentItem.display
-                                ? "var(--foreground)"
-                                : "var(--background)",
-                          }}
+                        <motion.div
+                          className="absolute w-full bg-foreground"
+                          layout
+                          layoutId={`nav--${spread.slug}`}
+                          key={`nav--${spread.slug}`}
+                          initial="initial"
+                          animate={["load", "move"]}
+                          variants={bars}
+                          custom={{ index: i, position: spread.position }}
                         >
-                          {j + 1}
-                        </span>
-                        {/* <span className="absolute h-full w-full -translate-1/2 top-1/2 left-1/2 any-pointer-fine:hidden" /> */}
-                      </div>
+                          <Link
+                            className="block size-full"
+                            href={spread.slug}
+                          />
+                        </motion.div>
+                      </motion.div>
                     ))}
-                    {currentItem.display > 0 && (
-                      <motion.div
-                        className={`border-4 border-foreground absolute h-full pointer-events-none -z-1`}
-                        style={{
-                          width: `calc(${currentItem.display - 1} * 0.25rem + ${
-                            currentItem.display
-                          } * (100% - ${data.length - 1} * 0.25rem)/${
-                            data.length
-                          })`,
-                        }}
-                      />
-                    )}
-                    <motion.div
-                      // data-lenis-prevent
-                      className={`absolute h-full z-10 flex items-center justify-center bg-red-500/10`}
-                      drag="x"
-                      dragConstraints={{
-                        left: 0,
-                        // right: 100,
-                        right:
-                          dragConstraintsRef.current && thumbRef.current
-                            ? dragConstraintsRef.current.clientWidth -
-                              thumbRef.current.clientWidth
-                            : 0,
-                      }}
-                      dragElastic={false}
-                      dragMomentum={false}
-                      // dragControls={controls}
-                      whileDrag={{ scale: 1.2 }}
-                      dragTransition={{
-                        power: 0,
-                        // timeConstant: 0.3,
-                        modifyTarget: (target) =>
-                          Math.round((target / dragWidth) * (data.length - 1)) *
-                          (dragWidth / (data.length - 1)),
-                      }}
-                      onDragStart={() => {
-                        setDragging(true);
-                      }}
-                      onDragEnd={() => {
-                        setDragging(false);
-                      }}
-                      style={{
-                        touchAction: "none",
-                        x: dragPos,
-                        width: `calc((100% - ${data.length - 1} * 0.25rem) / ${
-                          data.length
-                        })`,
-                      }}
-                      ref={thumbRef}
-                    >
-                      <div className="size-4 rounded-full bg-red-500" />
-                    </motion.div>
-                    {currentItem.display < data.length - 1 && (
-                      <motion.div
-                        className={`border-4 border-foreground absolute h-full pointer-events-none -z-1`}
-                        style={{
-                          right: 0,
-                          width: `calc(${
-                            data.length - currentItem.display - 2
-                          } * 0.25rem + ${
-                            data.length - currentItem.display - 1
-                          } * (100% - ${data.length - 1} * 0.25rem)/${
-                            data.length
-                          })`,
-                        }}
-                      />
-                    )}
                   </motion.div>
                 </div>
               </div>
             )}
           </AnimatePresence>
         </motion.section>
-        {data.map((item, i) => (
-          <section
-            key={`section--${i}`}
-            className="min-w-[100vw] h-svh min-h-[36rem]"
-            id={item.slug}
-          />
-        ))}
       </motion.main>
     </Fragment>
   );
