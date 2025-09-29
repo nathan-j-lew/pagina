@@ -3,7 +3,13 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  --midground: #b6b6b6;
   --warm-red: #f9423a;
+
+  --pizzi-web-base: 1.1875rem;
+  --pizzi-web-base--leading: 1.263;
+  --pizzi-web-lg: 1.8625rem;
+  --pizzi-web-lg--leading: 1.241;
 }
 
 @theme inline {
@@ -11,15 +17,12 @@
   --color-foreground: var(--foreground);
   --color-warm-red: var(--warm-red);
   --font-sans: var(--font-pizzi);
+  --text-pizzi-base: var(--pizzi-web-base);
+  --text-pizzi-base--leading: var(--pizzi-web-base--leading);
+  --text-pizzi-lg: var(--pizzi-web-lg);
+  --text-pizzi-lg--leading: var(--pizzi-web-lg--leading);
   /* --font-mono: var(--font-geist-mono); */
 }
-
-/* @media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-} */
 
 html {
   /* scrollbar-gutter: stable; */

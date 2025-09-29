@@ -19,8 +19,9 @@ export const Navbar = ({
   return (
     <nav className="fixed top-0 inset-x-0 z-10">
       <div className="px-[5%] py-4 flex space-x-4 text-2xl">
-        <Link href="/">Series</Link>
-        <Link href="/about">About</Link>
+        <Link href="/about" className="">
+          <span className="block size-10 bg-foreground" />
+        </Link>
         <div
           className="ml-auto flex"
           onClick={() => {

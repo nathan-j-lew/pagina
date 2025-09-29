@@ -87,16 +87,16 @@ export const Loader = ({
         closeModal();
       }}
       initial={{ opacity: 1 }}
-      animate={{ opacity: !loaded ? 1 : 0 }}
-      exit={{ opacity: 1 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
     >
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        transition={{
-          opacity: { duration: 0.7, ease: easeOut, delay: 0.3 },
-        }}
+        // transition={{
+        //   opacity: { duration: 0.7, ease: easeOut, delay: 0.3 },
+        // }}
       >
         <Logo className="min-h-9 object-contain" />
       </motion.div>

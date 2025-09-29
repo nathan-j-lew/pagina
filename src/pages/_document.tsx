@@ -4,7 +4,7 @@ export default function Document() {
   return (
     <Html lang="en" className="w-max">
       <Head />
-      <body className="antialiased w-max overflow-hidden">
+      <body className="antialiased w-max overflow-hidden text-pizzi-base">
         <Main />
         <NextScript />
       </body>

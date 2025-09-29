@@ -155,7 +155,7 @@ export default function App({ Component, pageProps }: AppProps) {
                   ? "vertical"
                   : "horizontal",
             }}
-            className="w-screen h-svh overflow-x-auto overflow-y-hidden sm:overflow-y-auto sm:overflow-x-hidden"
+            className="w-screen min-h-svh overflow-x-auto overflow-y-hidden sm:overflow-y-auto sm:overflow-x-hidden"
             ref={ref}
           >
             <MousePositionContext
@@ -165,7 +165,11 @@ export default function App({ Component, pageProps }: AppProps) {
                 <div
                   className={`${pizzi.variable} font-sans scrollbar-gutter-stable`}
                 >
-                  <Loader loaded={loaded} handler={() => setLoaded(true)} />
+                  <AnimatePresence mode="wait">
+                    {!loaded && (
+                      <Loader loaded={loaded} handler={() => setLoaded(true)} />
+                    )}
+                  </AnimatePresence>
 
                   <Component {...pageProps} />
                 </div>
