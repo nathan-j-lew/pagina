@@ -16,6 +16,7 @@ import { useRouter } from "next/router";
 import { AnimateParams, useMotionTimeline } from "@/hooks/useMotionTimeline";
 import clsx from "clsx";
 import { LoaderContext } from "@/context/Loader/LoaderContext";
+import { ResizeContext } from "@/context/Resize/ResizeContext";
 
 export const HomeDisplay = ({
   data,
@@ -28,37 +29,13 @@ export const HomeDisplay = ({
   item: {
     index: number;
     name: string;
+    href: string;
   };
-  itemHandler: (item: { index: number; name: string }) => void;
+  itemHandler: (item: { index: number; name: string; href: string }) => void;
 }) => {
   const [animated, setAnimated] = useState(false);
   const router = useRouter();
-  // const [scope, animate] = useMotionTimeline([
-  //   [
-  //     ".test",
-  //     { opacity: 1 },
-  //     { duration: 0.5, ease: "easeInOut", delay: stagger(0.1) },
-  //   ],
-
-  //   data.map(
-  //     (spread, i) =>
-  //       [
-  //         `.test${i}`,
-  //         {
-  //           translateY: "0%",
-  //           height: spread.position == "start" ? "80%" : "60%",
-  //         },
-  //         { type: spring, stiffness: 450, damping: 120, mass: 10 },
-  //       ] as AnimateParams
-  //   ),
-
-  //   [
-  //     ".pagina_home",
-  //     {
-  //       borderColor: "var(--foreground)",
-  //     },
-  //   ],
-  // ]);
+  const { size } = useContext(ResizeContext);
 
   const [scope, animate] = useAnimate();
 
@@ -156,12 +133,26 @@ export const HomeDisplay = ({
                 key={`nav_inner--${spread.slug}`}
                 custom={{ index: i, position: spread.position }}
                 onMouseEnter={() => {
-                  if (animated) itemHandler({ index: i, name: spread.title });
+                  if (animated)
+                    itemHandler({
+                      index: i,
+                      name: spread.title,
+                      href: `/${spread.slug}`,
+                    });
                 }}
                 href={`/${spread.slug}`}
                 onClick={(e) => {
                   e.preventDefault();
-                  router.push(`/${spread.slug}`);
+                  if (size.width >= 640) {
+                    router.push(`/${spread.slug}`);
+                  } else {
+                    if (animated)
+                      itemHandler({
+                        index: i,
+                        name: spread.title,
+                        href: `/${spread.slug}`,
+                      });
+                  }
                 }}
                 style={{
                   backgroundColor:
@@ -174,13 +165,19 @@ export const HomeDisplay = ({
           ))}
         </motion.div>
       </div>
-      <div className="flex flex-col">
+      <div className="flex landscape:flex-col ">
         {item.name !== "" ? (
           <Fragment>
-            <h2 className="text-pizzi-lg">{item.name}</h2>
-            <h3 className="text-pizzi-md">
-              {data.find((d) => d.title === item.name)?.subtitle}
-            </h3>
+            <div className="flex flex-col">
+              <h2 className="text-pizzi-lg">{item.name}</h2>
+              <h3 className="text-pizzi-md">
+                {data.find((d) => d.title === item.name)?.subtitle}
+              </h3>
+            </div>
+            <Link
+              href={item.href}
+              className="bg-foreground size-9  max-sm:portrait:ml-auto rounded-full"
+            />
           </Fragment>
         ) : (
           <Logo className="h-9" />

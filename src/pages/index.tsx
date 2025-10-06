@@ -60,6 +60,7 @@ export default function Home({ data }: { data: SpreadData[] }) {
   const [currentItem, setCurrentItem] = useState({
     index: -1,
     name: "",
+    href: "",
   });
 
   const { loaded } = useContext(LoaderContext);

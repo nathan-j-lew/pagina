@@ -7,9 +7,9 @@
   --warm-red: #f9423a;
 
   --pizzi-web-base: 1.1875rem;
-  --pizzi-web-base--leading: 1.263;
-  --pizzi-web-lg: 1.8625rem;
-  --pizzi-web-lg--leading: 1.241;
+  --pizzi-web-base--leading: 1.263157;
+  --pizzi-web-lg: 1.8125rem;
+  --pizzi-web-lg--leading: 1.241379;
 }
 
 @theme inline {
@@ -18,9 +18,9 @@
   --color-warm-red: var(--warm-red);
   --font-sans: var(--font-pizzi);
   --text-pizzi-base: var(--pizzi-web-base);
-  --text-pizzi-base--leading: var(--pizzi-web-base--leading);
+  --text-pizzi-base--line-height: var(--pizzi-web-base--leading);
   --text-pizzi-lg: var(--pizzi-web-lg);
-  --text-pizzi-lg--leading: var(--pizzi-web-lg--leading);
+  --text-pizzi-lg--line-height: var(--pizzi-web-lg--leading);
   /* --font-mono: var(--font-geist-mono); */
 }
 
