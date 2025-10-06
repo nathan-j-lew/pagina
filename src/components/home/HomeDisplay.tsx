@@ -1,9 +1,18 @@
 import { SpreadData } from "@/lib/spreads";
-import { circOut, motion } from "motion/react";
+import {
+  circOut,
+  easeInOut,
+  easeOut,
+  motion,
+  spring,
+  stagger,
+} from "motion/react";
 import Link from "next/link";
 import Logo from "@/assets/logo.svg";
 import { Fragment, useState } from "react";
 import { useRouter } from "next/router";
+import { useMotionTimeline } from "@/hooks/useMotionTimeline";
+import clsx from "clsx";
 
 export const HomeDisplay = ({
   data,
@@ -45,7 +54,7 @@ export const HomeDisplay = ({
       opacity: 1,
       transition: {
         duration: 0.3,
-        ease: circOut,
+        ease: easeOut,
         delay: custom.index * 0.1 + 0.5,
       },
     }),
@@ -54,15 +63,36 @@ export const HomeDisplay = ({
       height: custom.position === "start" ? "80%" : "60%",
       translateY: 0,
       transition: {
-        duration: 0.5,
-        ease: circOut,
+        // visualDuration: 0.5,
+        type: spring,
+        stiffness: 450,
+        damping: 120,
+        mass: 20,
+        // ease: easeInOut,
         delay: 1.3,
       },
     }),
   };
+
+  const scope = useMotionTimeline([
+    [
+      ".test",
+      { rotate: 360 },
+      { duration: 2, ease: "easeInOut", delay: stagger(0.1) },
+    ],
+    [
+      ".test",
+      { rotate: 0 },
+      { duration: 1, ease: "easeInOut", delay: stagger(0.1) },
+    ],
+  ]);
+
   return (
-    <div className="flex max-sm:portrait:flex-col sm:grid sm:grid-cols-5 sm:items-center gap-x-4 size-full">
-      <div className="bg-red-500/10 flex col-span-2 items-center sm:order-1">
+    <div
+      className="flex max-sm:portrait:flex-col max-sm:justify-center sm:grid sm:grid-cols-5 sm:items-center gap-4 size-full"
+      ref={scope}
+    >
+      <div className="flex col-span-2 items-center sm:order-1">
         {item.name !== "" ? (
           <h2 className="text-pizzi-lg">{item.name}</h2>
         ) : (
@@ -71,15 +101,15 @@ export const HomeDisplay = ({
       </div>
       <div className="col-span-3">
         <motion.div
-          className="aspect-square border-2 flex gap-x-1 object-contain size-[100cqmin]"
+          className="aspect-square border-2 flex gap-x-1 object-contain size-full"
           // initial={{ opacity: 0 }}
           // animate={{ opacity: 1, transition: { delay: 0.5 } }}
           layoutId="background"
           key="nav_container"
           //   initial={"initial"}
-          animate={loaded ? ["load", "move"] : "initial"}
+          // animate={loaded ? ["load", "move"] : "initial"}
           // custom={{ mode: mode }}
-          variants={container}
+          // variants={container}
         >
           {data.map((spread, i) => (
             <motion.div
@@ -93,12 +123,15 @@ export const HomeDisplay = ({
               variants={container}
             >
               <motion.a
-                className="absolute w-full"
+                className={clsx(
+                  "test absolute w-full",
+                  spread.position === "start" ? "h-4/5" : "h-3/5"
+                )}
                 layout
                 key={`nav_inner--${spread.slug}`}
-                initial="initial"
-                animate={loaded ? ["load", "move"] : "initial"}
-                variants={bars}
+                // initial="initial"
+                // animate={loaded ? ["load", "move"] : "initial"}
+                // variants={bars}
                 custom={{ index: i, position: spread.position }}
                 onMouseEnter={() => {
                   if (animated) itemHandler({ index: i, name: spread.title });

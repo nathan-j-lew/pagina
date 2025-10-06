@@ -66,7 +66,7 @@ export default function Home({ data }: { data: SpreadData[] }) {
 
   return (
     <Fragment>
-      <Navbar modeSwitches={[setModeList, setModeGrid]} mode={mode} />
+      {/* <Navbar modeSwitches={[setModeList, setModeGrid]} mode={mode} /> */}
       <motion.main className="items-center relative max-sm:max-h-svh flex flex-col max-sm:portrait:flex-row w-max">
         <motion.section
           className="fixed left-0 top-0 w-full h-svh flex flex-col overflow-hidden"

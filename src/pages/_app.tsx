@@ -24,7 +24,7 @@ export default function App({ Component, pageProps }: AppProps) {
     orientation: "vertical",
   });
 
-  const [loaded, setLoaded] = useState(false);
+  const [loaded, setLoaded] = useState(true);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [clicked, setClicked] = useState<{
     x: number | null;
@@ -53,7 +53,7 @@ export default function App({ Component, pageProps }: AppProps) {
         orientation:
           window.innerWidth > window.innerHeight ? "horizontal" : "vertical",
       });
-      setLoaded(false);
+      setLoaded(true);
       // console.log(lenis);
     }
   };
