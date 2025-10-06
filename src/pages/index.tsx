@@ -74,16 +74,12 @@ export default function Home({ data }: { data: SpreadData[] }) {
         >
           <div className="flex flex-col justify-center items-center h-full p-4">
             <AnimatePresence>
-              {mode === "grid" ? (
-                <HomeDisplay
-                  data={data}
-                  loaded={loaded}
-                  item={currentItem}
-                  itemHandler={setCurrentItem}
-                />
-              ) : (
-                <div />
-              )}
+              <HomeDisplay
+                data={data}
+                loaded={loaded}
+                item={currentItem}
+                itemHandler={setCurrentItem}
+              />
             </AnimatePresence>
           </div>
         </motion.section>

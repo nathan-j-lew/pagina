@@ -24,7 +24,7 @@ export default function App({ Component, pageProps }: AppProps) {
     orientation: "vertical",
   });
 
-  const [loaded, setLoaded] = useState(true);
+  const [loaded, setLoaded] = useState(false);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [clicked, setClicked] = useState<{
     x: number | null;
@@ -161,16 +161,10 @@ export default function App({ Component, pageProps }: AppProps) {
             <MousePositionContext
               value={{ position: mousePosition, clicked: clicked, taps: taps }}
             >
-              <LoaderContext value={{ loaded: loaded }}>
+              <LoaderContext value={{ loaded: loaded, setLoaded: setLoaded }}>
                 <div
                   className={`${pizzi.variable} font-sans scrollbar-gutter-stable`}
                 >
-                  <AnimatePresence mode="wait">
-                    {!loaded && (
-                      <Loader loaded={loaded} handler={() => setLoaded(true)} />
-                    )}
-                  </AnimatePresence>
-
                   <Component {...pageProps} />
                 </div>
               </LoaderContext>

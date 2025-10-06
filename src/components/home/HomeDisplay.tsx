@@ -1,18 +1,21 @@
 import { SpreadData } from "@/lib/spreads";
 import {
+  AnimationSequence,
   circOut,
   easeInOut,
   easeOut,
   motion,
   spring,
   stagger,
+  useAnimate,
 } from "motion/react";
 import Link from "next/link";
 import Logo from "@/assets/logo.svg";
-import { Fragment, useState } from "react";
+import { Fragment, useEffect, useState, useContext } from "react";
 import { useRouter } from "next/router";
 import { AnimateParams, useMotionTimeline } from "@/hooks/useMotionTimeline";
 import clsx from "clsx";
+import { LoaderContext } from "@/context/Loader/LoaderContext";
 
 export const HomeDisplay = ({
   data,
@@ -30,81 +33,83 @@ export const HomeDisplay = ({
 }) => {
   const [animated, setAnimated] = useState(false);
   const router = useRouter();
-  const container = {
-    initial: {
-      borderColor: "var(--background)",
-    },
-    load: {
-      borderColor: "var(--foreground)",
-      transition: {
-        when: "afterChildren",
-        duration: 0.5,
-        ease: circOut,
-      },
-    },
-  };
+  // const [scope, animate] = useMotionTimeline([
+  //   [
+  //     ".test",
+  //     { opacity: 1 },
+  //     { duration: 0.5, ease: "easeInOut", delay: stagger(0.1) },
+  //   ],
 
-  const bars = {
-    initial: (custom: { position: "start" | "end"; index: number }) => ({
-      height: "40%",
-      translateY: custom.position === "start" ? "75%" : "-75%",
-      opacity: 0,
-    }),
-    load: (custom: { position: "start" | "end"; index: number }) => ({
-      opacity: 1,
-      transition: {
-        duration: 0.3,
-        ease: easeOut,
-        delay: custom.index * 0.1 + 0.5,
-      },
-    }),
-    move: (custom: { position: "start" | "end"; index: number }) => ({
-      // opacity: 1,
-      height: custom.position === "start" ? "80%" : "60%",
-      translateY: 0,
-      transition: {
-        // visualDuration: 0.5,
-        type: spring,
-        stiffness: 450,
-        damping: 120,
-        mass: 20,
-        // ease: easeInOut,
-        delay: 1.3,
-      },
-    }),
-  };
+  //   data.map(
+  //     (spread, i) =>
+  //       [
+  //         `.test${i}`,
+  //         {
+  //           translateY: "0%",
+  //           height: spread.position == "start" ? "80%" : "60%",
+  //         },
+  //         { type: spring, stiffness: 450, damping: 120, mass: 10 },
+  //       ] as AnimateParams
+  //   ),
 
-  const scope = useMotionTimeline([
+  //   [
+  //     ".pagina_home",
+  //     {
+  //       borderColor: "var(--foreground)",
+  //     },
+  //   ],
+  // ]);
+
+  const [scope, animate] = useAnimate();
+
+  const enter: AnimationSequence = [
     [
       ".test",
       { opacity: 1 },
-      { duration: 0.5, ease: "easeInOut", delay: stagger(0.1) },
+      { duration: 0.5, ease: easeInOut, delay: stagger(0.1) },
     ],
+    "load",
+    [
+      ".test[data-position='start']",
+      { translateY: "0%", height: "80%" },
 
-    data.map(
-      (spread, i) =>
-        [
-          `.test${i}`,
-          {
-            translateY: "0%",
-            height: spread.position == "start" ? "80%" : "60%",
-          },
-          { type: spring, stiffness: 450, damping: 120, mass: 10 },
-        ] as AnimateParams
-    ),
-
-    // [[".test", { scale: 1.1 }, { duration: 0.5, ease: "easeInOut" }]],
+      { type: spring, stiffness: 450, damping: 120, mass: 10 },
+    ],
+    [
+      ".test[data-position='end']",
+      { translateY: "0%", height: "60%" },
+      { at: "load", type: spring, stiffness: 450, damping: 120, mass: 10 },
+    ],
     [
       ".pagina_home",
-      {
-        borderColor: "var(--foreground)",
-      },
+      { borderColor: "var(--foreground)" },
+      { at: "load", delay: 0.2 },
     ],
-  ]);
+  ];
+
+  const { setLoaded } = useContext(LoaderContext);
+
+  useEffect(() => {
+    console.log("loaded", loaded);
+    const animEnter = animate(enter);
+    if (!loaded) {
+      (async () => {
+        animEnter.then(() => {
+          console.log("set loaded true");
+          setLoaded(true);
+          setAnimated(true);
+        });
+        // setLoaded(true);
+      })();
+    } else {
+      animate(enter).complete();
+      setAnimated(true);
+    }
+  }, []);
 
   return (
     <div
-      className="flex max-sm:portrait:flex-col max-sm:justify-center sm:grid sm:grid-cols-5 sm:items-center gap-4 size-full"
+      className="flex max-sm:portrait:flex-col max-sm:justify-center gap-4 size-full"
       ref={scope}
     >
       <div className="flex col-span-2 items-center sm:order-1">
@@ -129,15 +134,24 @@ export const HomeDisplay = ({
                   spread.position === "start" ? "flex-start" : "flex-end",
               }}
               layout
-              variants={container}
             >
               <motion.a
-                className={clsx(
-                  `test test${i} absolute w-full transform`
-                  // spread.position === "start"
-                  //   ? "translate-y-3/4"
-                  //   : "-translate-y-3/4"
-                )}
+                initial={
+                  loaded
+                    ? {
+                        opacity: 1,
+                        translateY: "0%",
+                        height: spread.position === "start" ? "80%" : "60%",
+                      }
+                    : {
+                        opacity: 0,
+                        translateY:
+                          spread.position === "start" ? "75%" : "-75%",
+                        height: "40%",
+                      }
+                }
+                className={clsx(`test absolute w-full transform`)}
+                data-position={spread.position}
                 layout
                 key={`nav_inner--${spread.slug}`}
                 custom={{ index: i, position: spread.position }}
@@ -152,9 +166,6 @@ export const HomeDisplay = ({
                 style={{
                   backgroundColor:
                     item.index == i ? "var(--midground)" : "var(--foreground)",
-                  opacity: 0,
-                  translateY: spread.position === "start" ? "75%" : "-75%",
-                  height: "40%",
                 }}
               >
                 <span className="sr-only">{spread.title}</span>
