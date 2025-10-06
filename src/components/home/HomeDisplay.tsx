@@ -11,7 +11,7 @@ import Link from "next/link";
 import Logo from "@/assets/logo.svg";
 import { Fragment, useState } from "react";
 import { useRouter } from "next/router";
-import { useMotionTimeline } from "@/hooks/useMotionTimeline";
+import { AnimateParams, useMotionTimeline } from "@/hooks/useMotionTimeline";
 import clsx from "clsx";
 
 export const HomeDisplay = ({
@@ -75,12 +75,25 @@ export const HomeDisplay = ({
   };
 
   const scope = useMotionTimeline([
-    [".test", { rotate: 360 }, { duration: 2, ease: "easeInOut" }],
     [
       ".test",
-      { translateY: "0%", height: "60%" },
-      { duration: 1, ease: "easeInOut", delay: stagger(0.1) },
+      { opacity: 1 },
+      { duration: 0.5, ease: "easeInOut", delay: stagger(0.1) },
     ],
+
+    data.map(
+      (spread, i) =>
+        [
+          `.test${i}`,
+          {
+            translateY: "0%",
+            height: spread.position == "start" ? "80%" : "60%",
+          },
+          { type: spring, stiffness: 450, damping: 120, mass: 10 },
+        ] as AnimateParams
+    ),
+
+    // [[".test", { scale: 1.1 }, { duration: 0.5, ease: "easeInOut" }]],
     [
       ".pagina_home",
       {
@@ -120,7 +133,7 @@ export const HomeDisplay = ({
             >
               <motion.a
                 className={clsx(
-                  "test absolute w-full"
+                  `test test${i} absolute w-full transform`
                   // spread.position === "start"
                   //   ? "translate-y-3/4"
                   //   : "-translate-y-3/4"
@@ -139,6 +152,7 @@ export const HomeDisplay = ({
                 style={{
                   backgroundColor:
                     item.index == i ? "var(--midground)" : "var(--foreground)",
+                  opacity: 0,
                   translateY: spread.position === "start" ? "75%" : "-75%",
                   height: "40%",
                 }}

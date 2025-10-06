@@ -6,7 +6,7 @@ import {
 import { useAnimate } from "motion/react";
 import { useEffect, useRef } from "react";
 
-type AnimateParams = [
+export type AnimateParams = [
   ElementOrSelector,
   DOMKeyframesDefinition,
   (AnimationOptions | undefined)?
