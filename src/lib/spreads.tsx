@@ -6,6 +6,7 @@ const spreadsDirectory = path.join(process.cwd(), "src/spreads/");
 
 export type SpreadData = {
   title: string;
+  subtitle: string;
   hex: string;
   slug: string;
   order: number;

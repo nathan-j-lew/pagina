@@ -112,16 +112,16 @@ export const HomeDisplay = ({
       className="flex max-sm:portrait:flex-col max-sm:justify-center gap-4 size-full"
       ref={scope}
     >
-      <div className="flex col-span-2 items-center sm:order-1">
-        {item.name !== "" ? (
-          <h2 className="text-pizzi-lg">{item.name}</h2>
-        ) : (
-          <Logo className="h-9" />
-        )}
-      </div>
       <div className="col-span-3">
         <motion.div
-          className="pagina_home aspect-square border-2 border-transparent flex gap-x-1 object-contain size-full"
+          initial={
+            loaded
+              ? {
+                  borderColor: "var(--foreground)",
+                }
+              : { borderColor: "#88888800" }
+          }
+          className="pagina_home aspect-square border-2 flex gap-x-1 object-contain size-full"
           layoutId="background"
           key="nav_container"
         >
@@ -173,6 +173,18 @@ export const HomeDisplay = ({
             </motion.div>
           ))}
         </motion.div>
+      </div>
+      <div className="flex flex-col">
+        {item.name !== "" ? (
+          <Fragment>
+            <h2 className="text-pizzi-lg">{item.name}</h2>
+            <h3 className="text-pizzi-md">
+              {data.find((d) => d.title === item.name)?.subtitle}
+            </h3>
+          </Fragment>
+        ) : (
+          <Logo className="h-9" />
+        )}
       </div>
     </div>
   );
