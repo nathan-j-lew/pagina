@@ -75,15 +75,17 @@ export const HomeDisplay = ({
   };
 
   const scope = useMotionTimeline([
+    [".test", { rotate: 360 }, { duration: 2, ease: "easeInOut" }],
     [
       ".test",
-      { rotate: 360 },
-      { duration: 2, ease: "easeInOut", delay: stagger(0.1) },
+      { translateY: "0%", height: "60%" },
+      { duration: 1, ease: "easeInOut", delay: stagger(0.1) },
     ],
     [
-      ".test",
-      { rotate: 0 },
-      { duration: 1, ease: "easeInOut", delay: stagger(0.1) },
+      ".pagina_home",
+      {
+        borderColor: "var(--foreground)",
+      },
     ],
   ]);
 
@@ -101,15 +103,9 @@ export const HomeDisplay = ({
       </div>
       <div className="col-span-3">
         <motion.div
-          className="aspect-square border-2 flex gap-x-1 object-contain size-full"
-          // initial={{ opacity: 0 }}
-          // animate={{ opacity: 1, transition: { delay: 0.5 } }}
+          className="pagina_home aspect-square border-2 border-transparent flex gap-x-1 object-contain size-full"
           layoutId="background"
           key="nav_container"
-          //   initial={"initial"}
-          // animate={loaded ? ["load", "move"] : "initial"}
-          // custom={{ mode: mode }}
-          // variants={container}
         >
           {data.map((spread, i) => (
             <motion.div
@@ -124,14 +120,13 @@ export const HomeDisplay = ({
             >
               <motion.a
                 className={clsx(
-                  "test absolute w-full",
-                  spread.position === "start" ? "h-4/5" : "h-3/5"
+                  "test absolute w-full"
+                  // spread.position === "start"
+                  //   ? "translate-y-3/4"
+                  //   : "-translate-y-3/4"
                 )}
                 layout
                 key={`nav_inner--${spread.slug}`}
-                // initial="initial"
-                // animate={loaded ? ["load", "move"] : "initial"}
-                // variants={bars}
                 custom={{ index: i, position: spread.position }}
                 onMouseEnter={() => {
                   if (animated) itemHandler({ index: i, name: spread.title });
@@ -144,6 +139,8 @@ export const HomeDisplay = ({
                 style={{
                   backgroundColor:
                     item.index == i ? "var(--midground)" : "var(--foreground)",
+                  translateY: spread.position === "start" ? "75%" : "-75%",
+                  height: "40%",
                 }}
               >
                 <span className="sr-only">{spread.title}</span>
