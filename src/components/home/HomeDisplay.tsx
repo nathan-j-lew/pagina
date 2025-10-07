@@ -1,6 +1,7 @@
 import { SpreadData } from "@/lib/spreads";
 import {
   AnimationSequence,
+  circInOut,
   circOut,
   easeInOut,
   easeOut,
@@ -8,6 +9,7 @@ import {
   spring,
   stagger,
   useAnimate,
+  Variants,
 } from "motion/react";
 import Link from "next/link";
 import Logo from "@/assets/logo.svg";
@@ -33,100 +35,101 @@ export const HomeDisplay = ({
   };
   itemHandler: (item: { index: number; name: string; href: string }) => void;
 }) => {
-  const [animated, setAnimated] = useState(false);
+  type STATES = "loadIn" | "idle" | "preactive" | "active";
+  const [animationStateGroup, setAnimationStateGroup] = useState<STATES[]>(
+    data.map(() => (loaded ? "active" : "loadIn"))
+  );
+  const [animationState, setAnimationState] = useState<STATES>(
+    loaded ? "active" : "loadIn"
+  );
+
+  const [animated, setAnimated] = useState(loaded);
   const router = useRouter();
   const { size } = useContext(ResizeContext);
 
-  const [scope, animate] = useAnimate();
-
-  const enter: AnimationSequence = [
-    [
-      ".test",
-      { opacity: 1 },
-      { duration: 0.5, ease: easeInOut, delay: stagger(0.1) },
-    ],
-    "load",
-    [
-      ".test[data-position='start']",
-      { translateY: "0%", height: "80%" },
-
-      { type: spring, stiffness: 450, damping: 120, mass: 10 },
-    ],
-    [
-      ".test[data-position='end']",
-      { translateY: "0%", height: "60%" },
-      { at: "load", type: spring, stiffness: 450, damping: 120, mass: 10 },
-    ],
-    [
-      ".pagina_home",
-      { borderColor: "var(--foreground)" },
-      { at: "load", delay: 0.2 },
-    ],
-  ];
-
   const { setLoaded } = useContext(LoaderContext);
 
-  useEffect(() => {
-    console.log("loaded", loaded);
-    const animEnter = animate(enter);
-    if (!loaded) {
-      (async () => {
-        animEnter.then(() => {
-          console.log("set loaded true");
-          setLoaded(true);
-          setAnimated(true);
-        });
-        // setLoaded(true);
-      })();
-    } else {
-      animate(enter).complete();
-      setAnimated(true);
-    }
-  }, []);
+  const bars: Variants = {
+    preload: {
+      opacity: 0,
+      translateY: "0%",
+      height: "40%",
+    },
+    loadIn: (custom: { index: number; position: string }, current) => ({
+      opacity: 1,
+      translateY: [null, "50%"],
+      transition: {
+        duration: 0.2,
+        delay: custom.index * 0.1,
+        ease: circOut,
+      },
+    }),
+    idle: (custom: { index: number; position: string }) => ({
+      translateY: [null, "-50%"],
+      opacity: 1,
+      transition: {
+        repeat: Infinity,
+        repeatType: "reverse",
+        delay: custom.index * 0.1,
+        duration: 1,
+        ease: "circInOut",
+      },
+    }),
+    preactive: {
+      translateY: "0%",
+      opacity: 1,
+      height: "40%",
+      transition: { duration: 0.2, ease: easeInOut },
+    },
+    active: (custom: { index: number; position: string }) => ({
+      translateY: "0%",
+      opacity: 1,
+      height: custom.position == "start" ? "80%" : "60%",
+      // transition: {
+      //   delay: custom.index * 0.1,
+      // },
+      // transition: {
+      //   repeat: Infinity,
+      //   repeatType: "reverse",
+      //   delay: custom.index * 0.1,
+      //   duration: 1,
+      //   ease: "circInOut",
+      // },
+    }),
+  };
 
   return (
-    <div
-      className="flex max-sm:portrait:flex-col max-sm:justify-center gap-4 size-full"
-      ref={scope}
-    >
+    <div className="flex max-sm:portrait:flex-col max-sm:justify-center gap-4 size-full">
       <div className="col-span-3">
         <motion.div
-          initial={
-            loaded
-              ? {
-                  borderColor: "var(--foreground)",
-                }
-              : { borderColor: "#88888800" }
-          }
           className="pagina_home aspect-square border-2 flex gap-x-1 object-contain size-full"
           layoutId="background"
           key="nav_container"
+          initial={"preload"}
+          animate={animationState}
+          variants={{
+            preload: { borderColor: "#88888800" },
+            active: {
+              borderColor: "var(--foreground)",
+              transition: { when: "afterChildren" },
+            },
+          }}
         >
           {data.map((spread, i) => (
             <motion.div
               key={`nav--${spread.slug}`}
-              className={`size-full bg-[${spread.hex}] relative flex flex-col overflow-hidden`}
+              className={`size-full bg-[${spread.hex}] relative flex flex-col perspective-near`}
+              layout
               style={{
                 justifyContent:
-                  spread.position === "start" ? "flex-start" : "flex-end",
+                  animationState == "active" ? spread.position : "center",
               }}
-              layout
+              // variants={{}}
             >
               <motion.a
-                initial={
-                  loaded
-                    ? {
-                        opacity: 1,
-                        translateY: "0%",
-                        height: spread.position === "start" ? "80%" : "60%",
-                      }
-                    : {
-                        opacity: 0,
-                        translateY:
-                          spread.position === "start" ? "75%" : "-75%",
-                        height: "40%",
-                      }
-                }
+                initial={"preload"}
+                animate={animationStateGroup[i]}
+                variants={bars}
                 className={clsx(`test absolute w-full transform`)}
                 data-position={spread.position}
                 layout
@@ -157,6 +160,35 @@ export const HomeDisplay = ({
                 style={{
                   backgroundColor:
                     item.index == i ? "var(--midground)" : "var(--foreground)",
+                  // rotateX: item.index == i ? "-120deg" : "0deg",
+                  // transformOrigin: "center bottom",
+                }}
+                onAnimationComplete={() => {
+                  if (animationStateGroup[i] == "loadIn") {
+                    if (i == data.length - 1) {
+                      setTimeout(() => {
+                        setAnimationState("preactive");
+                        setAnimationStateGroup(data.map(() => "preactive"));
+                        setAnimated(true);
+                        setLoaded(true);
+                      }, 2000);
+                    }
+                    setAnimationStateGroup((prev) => {
+                      const newState = [...prev];
+                      newState[i] = "idle";
+                      return newState;
+                    });
+                    // setAnimated(true);
+                    // setLoaded(true);
+                  }
+                  if (animationStateGroup[i] == "preactive") {
+                    setAnimationState("active");
+                    setAnimationStateGroup((prev) => {
+                      const newState = [...prev];
+                      newState[i] = "active";
+                      return newState;
+                    });
+                  }
                 }}
               >
                 <span className="sr-only">{spread.title}</span>
@@ -179,9 +211,7 @@ export const HomeDisplay = ({
               className="bg-foreground size-9  max-sm:portrait:ml-auto rounded-full"
             />
           </Fragment>
-        ) : (
-          <Logo className="h-9" />
-        )}
+        ) : null}
       </div>
     </div>
   );
