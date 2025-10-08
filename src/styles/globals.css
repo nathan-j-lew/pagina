@@ -4,7 +4,7 @@
   --background: hsl(0, 0%, 95%);
   --foreground: hsl(0, 0%, 9%);
   --disabled: hsl(0, 0, 83%);
-  --midground: #b6b6b6;
+  --active: hsl(0, 0, 56%);
   --warm-red: #f9423a;
 
   --pizzi-web-base: 1.1875rem;
@@ -17,12 +17,14 @@
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-disabled: var(--disabled);
+  --color-active: var(--active);
   --color-warm-red: var(--warm-red);
   --font-sans: var(--font-pizzi);
   --text-pizzi-base: var(--pizzi-web-base);
   --text-pizzi-base--line-height: var(--pizzi-web-base--leading);
   --text-pizzi-lg: var(--pizzi-web-lg);
   --text-pizzi-lg--line-height: var(--pizzi-web-lg--leading);
+  --aspect-book: 236 / 216;
   /* --font-mono: var(--font-geist-mono); */
 }
 

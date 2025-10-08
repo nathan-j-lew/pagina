@@ -100,27 +100,31 @@ export const HomeDisplay = ({
 
   return (
     <motion.div
-      className="flex flex-1 min-h-fit max-sm:portrait:flex-col max-sm:justify-center gap-4 landscape:h-full portrait:w-full"
+      className="flex flex-col flex-1 min-h-fit max-sm:landscape:flex-row max-sm:justify-center items-center gap-3 size-full"
       initial={"preload"}
       animate={animationState}
+      exit={{
+        opacity: 0,
+        y: "-10%",
+      }}
     >
-      <motion.div
-        className="flex-1 "
-        variants={{
-          preload: { opacity: 0 },
-          active: { opacity: 1, transition: { delay: 0.3 } },
-        }}
-      >
-        <Link
-          href="/about"
-          className="block size-9 bg-foreground ml-auto"
-          style={{ pointerEvents: animated ? "auto" : "none" }}
+      <motion.div className="flex-1 flex flex-col items-center justify-end">
+        <motion.div
+          variants={{
+            preload: { opacity: 0 },
+            active: { opacity: 1, transition: { delay: 0.3 } },
+          }}
         >
-          <span className="sr-only">About</span>
-        </Link>
+          <Link href="/about">
+            <motion.span className="block size-12">
+              <motion.span className="block size-full scale-105 rounded-full bg-foreground" />
+            </motion.span>
+            <span className="sr-only">About</span>
+          </Link>
+        </motion.div>
       </motion.div>
       <motion.div
-        className="flex-none aspect-square border-2 flex gap-x-1 object-contain size-full max-w-[calc(100svmin-2*var(--paddingLocal))] max-h-[calc(100svmin-2*var(--paddingLocal))]"
+        className="flex-none aspect-square border-2 flex gap-x-1 size-full max-w-[calc(100svmin-2*var(--paddingLocal))] max-h-[calc(100svmin-2*var(--paddingLocal))]"
         layoutId="background"
         key="nav_container"
         variants={{
@@ -162,7 +166,7 @@ export const HomeDisplay = ({
               href={`/${spread.slug}`}
               onClick={(e) => {
                 e.preventDefault();
-                if (size.width >= 640) {
+                if (size.width >= 960) {
                   router.push(`/${spread.slug}`);
                 } else {
                   if (animated)
@@ -175,7 +179,7 @@ export const HomeDisplay = ({
               }}
               style={{
                 backgroundColor:
-                  item.index == i ? "var(--midground)" : "var(--foreground)",
+                  item.index == i ? "var(--active)" : "var(--foreground)",
               }}
               onAnimationComplete={() => {
                 if (animationStateGroup[i] == "loadIn") {
@@ -208,19 +212,8 @@ export const HomeDisplay = ({
           </motion.div>
         ))}
       </motion.div>
-      <motion.div className="grid grid-cols-[1fr_2.25rem] gap-x-1 landscape:flex-col flex-1">
-        <div>
-          {item.name !== "" ? (
-            <Fragment>
-              <div className="flex flex-col">
-                <h2 className="text-pizzi-lg">{item.name}</h2>
-                <h3 className="text-pizzi-md">
-                  {data.find((d) => d.title === item.name)?.subtitle}
-                </h3>
-              </div>
-            </Fragment>
-          ) : null}
-        </div>
+
+      <motion.div className="flex flex-col items-center gap-3 flex-1">
         <motion.div
           variants={{
             preload: { opacity: 0 },
@@ -228,15 +221,24 @@ export const HomeDisplay = ({
           }}
         >
           <Link href={item.href}>
-            <motion.span
-              className="block size-9 ml-auto rounded-full"
-              animate={{
-                backgroundColor:
-                  item.href !== "" ? "var(--foreground)" : "var(--disabled)",
-              }}
-            ></motion.span>
+            <motion.span className="block size-12">
+              <motion.span
+                className="block size-full scale-105 rounded-full"
+                animate={{
+                  backgroundColor:
+                    item.href !== "" ? "var(--foreground)" : "var(--disabled)",
+                }}
+              />
+            </motion.span>
             <span className="sr-only">{item.name}</span>
           </Link>
+        </motion.div>
+        <motion.div>
+          {item.name !== "" ? (
+            <Link href={item.href} className="text-pizzi-lg">
+              {item.name}
+            </Link>
+          ) : null}
         </motion.div>
       </motion.div>
     </motion.div>
