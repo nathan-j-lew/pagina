@@ -1,8 +1,9 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: hsl(0, 0%, 95%);
+  --foreground: hsl(0, 0%, 9%);
+  --disabled: hsl(0, 0, 83%);
   --midground: #b6b6b6;
   --warm-red: #f9423a;
 
@@ -15,6 +16,7 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-disabled: var(--disabled);
   --color-warm-red: var(--warm-red);
   --font-sans: var(--font-pizzi);
   --text-pizzi-base: var(--pizzi-web-base);

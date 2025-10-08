@@ -70,10 +70,13 @@ export default function Home({ data }: { data: SpreadData[] }) {
       {/* <Navbar modeSwitches={[setModeList, setModeGrid]} mode={mode} /> */}
       <motion.main className="items-center relative max-sm:max-h-svh flex flex-col max-sm:portrait:flex-row w-max">
         <motion.section
-          className="fixed left-0 top-0 w-full h-svh flex flex-col overflow-hidden"
+          className="fixed left-0 top-0 w-full h-svh flex flex-col overflow-auto"
           layoutScroll
         >
-          <div className="flex flex-col justify-center items-center h-full p-4">
+          <div
+            className="flex flex-col justify-center items-center h-full p-(--paddingLocal) min-h-fit "
+            style={{ "--paddingLocal": "1rem" } as React.CSSProperties}
+          >
             <AnimatePresence>
               <HomeDisplay
                 data={data}

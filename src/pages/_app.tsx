@@ -21,7 +21,7 @@ const pizzi = localFont({
 export default function App({ Component, pageProps }: AppProps) {
   const [resize, setResize] = useState<ResizeInfo>({
     size: { width: 0, height: 0 },
-    orientation: "vertical",
+    orientation: "landscape",
   });
 
   const [loaded, setLoaded] = useState(false);
@@ -51,7 +51,7 @@ export default function App({ Component, pageProps }: AppProps) {
       setResize({
         size: { width: window.innerWidth, height: window.innerHeight },
         orientation:
-          window.innerWidth > window.innerHeight ? "horizontal" : "vertical",
+          window.innerWidth > window.innerHeight ? "landscape" : "portrait",
       });
       setLoaded(true);
       // console.log(lenis);

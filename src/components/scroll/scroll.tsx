@@ -285,7 +285,7 @@ export const ScrollIndicator = ({
                 strokeWidth: 32,
                 strokeDasharray: circumference,
                 strokeDashoffset:
-                  orientation === "vertical" ? testOffsetX : testOffsetY,
+                  orientation === "landscape" ? testOffsetX : testOffsetY,
               }}
             />
           </motion.svg>

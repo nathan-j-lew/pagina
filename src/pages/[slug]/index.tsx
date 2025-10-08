@@ -33,6 +33,9 @@ export default function Page({
     blurDataURL?: string;
   }[];
 }) {
+  useEffect(() => {
+    console.log(images);
+  }, []);
   const { orientation, size } = useContext(ResizeContext);
   const lenis = useLenis();
   useEffect(() => {
@@ -76,11 +79,11 @@ export default function Page({
         className="flex max-sm:portrait:flex-row flex-col items-center relative"
         style={{
           width:
-            images.length > 0 && orientation === "vertical"
+            images.length > 0 && orientation === "landscape"
               ? images.length * 100 + "vw"
               : "100vw",
           height:
-            images.length > 0 && orientation === "horizontal"
+            images.length > 0 && orientation === "portrait"
               ? images.length * 50 + "vh"
               : "100vh",
         }}

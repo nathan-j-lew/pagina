@@ -99,120 +99,146 @@ export const HomeDisplay = ({
   };
 
   return (
-    <div className="flex max-sm:portrait:flex-col max-sm:justify-center gap-4 size-full">
-      <div className="col-span-3">
-        <motion.div
-          className="pagina_home aspect-square border-2 flex gap-x-1 object-contain size-full"
-          layoutId="background"
-          key="nav_container"
-          initial={"preload"}
-          animate={animationState}
-          variants={{
-            preload: { borderColor: "#88888800" },
-            active: {
-              borderColor: "var(--foreground)",
-              transition: { when: "afterChildren" },
-            },
-          }}
+    <motion.div
+      className="flex flex-1 min-h-fit max-sm:portrait:flex-col max-sm:justify-center gap-4 landscape:h-full portrait:w-full"
+      initial={"preload"}
+      animate={animationState}
+    >
+      <motion.div
+        className="flex-1 "
+        variants={{
+          preload: { opacity: 0 },
+          active: { opacity: 1, transition: { delay: 0.3 } },
+        }}
+      >
+        <Link
+          href="/about"
+          className="block size-9 bg-foreground ml-auto"
+          style={{ pointerEvents: animated ? "auto" : "none" }}
         >
-          {data.map((spread, i) => (
-            <motion.div
-              key={`nav--${spread.slug}`}
-              className={`size-full bg-[${spread.hex}] relative flex flex-col perspective-near`}
+          <span className="sr-only">About</span>
+        </Link>
+      </motion.div>
+      <motion.div
+        className="flex-none aspect-square border-2 flex gap-x-1 object-contain size-full max-w-[calc(100svmin-2*var(--paddingLocal))] max-h-[calc(100svmin-2*var(--paddingLocal))]"
+        layoutId="background"
+        key="nav_container"
+        variants={{
+          preload: { borderColor: "#88888800" },
+          active: {
+            borderColor: "var(--foreground)",
+            transition: { when: "afterChildren" },
+          },
+        }}
+      >
+        {data.map((spread, i) => (
+          <motion.div
+            key={`nav--${spread.slug}`}
+            className={`size-full bg-[${spread.hex}] relative flex flex-col perspective-near`}
+            layout
+            style={{
+              justifyContent:
+                animationState == "active" ? spread.position : "center",
+            }}
+            // variants={{}}
+          >
+            <motion.a
+              initial={"preload"}
+              animate={animationStateGroup[i]}
+              variants={bars}
+              className={clsx(`test absolute w-full transform`)}
+              data-position={spread.position}
               layout
-              style={{
-                justifyContent:
-                  animationState == "active" ? spread.position : "center",
+              key={`nav_inner--${spread.slug}`}
+              custom={{ index: i, position: spread.position }}
+              onMouseEnter={() => {
+                if (animated)
+                  itemHandler({
+                    index: i,
+                    name: spread.title,
+                    href: `/${spread.slug}`,
+                  });
               }}
-              // variants={{}}
-            >
-              <motion.a
-                initial={"preload"}
-                animate={animationStateGroup[i]}
-                variants={bars}
-                className={clsx(`test absolute w-full transform`)}
-                data-position={spread.position}
-                layout
-                key={`nav_inner--${spread.slug}`}
-                custom={{ index: i, position: spread.position }}
-                onMouseEnter={() => {
+              href={`/${spread.slug}`}
+              onClick={(e) => {
+                e.preventDefault();
+                if (size.width >= 640) {
+                  router.push(`/${spread.slug}`);
+                } else {
                   if (animated)
                     itemHandler({
                       index: i,
                       name: spread.title,
                       href: `/${spread.slug}`,
                     });
-                }}
-                href={`/${spread.slug}`}
-                onClick={(e) => {
-                  e.preventDefault();
-                  if (size.width >= 640) {
-                    router.push(`/${spread.slug}`);
-                  } else {
-                    if (animated)
-                      itemHandler({
-                        index: i,
-                        name: spread.title,
-                        href: `/${spread.slug}`,
-                      });
+                }
+              }}
+              style={{
+                backgroundColor:
+                  item.index == i ? "var(--midground)" : "var(--foreground)",
+              }}
+              onAnimationComplete={() => {
+                if (animationStateGroup[i] == "loadIn") {
+                  if (i == data.length - 1) {
+                    setTimeout(() => {
+                      setAnimationState("preactive");
+                      setAnimationStateGroup(data.map(() => "preactive"));
+                    }, 2000);
                   }
-                }}
-                style={{
-                  backgroundColor:
-                    item.index == i ? "var(--midground)" : "var(--foreground)",
-                  // rotateX: item.index == i ? "-120deg" : "0deg",
-                  // transformOrigin: "center bottom",
-                }}
-                onAnimationComplete={() => {
-                  if (animationStateGroup[i] == "loadIn") {
-                    if (i == data.length - 1) {
-                      setTimeout(() => {
-                        setAnimationState("preactive");
-                        setAnimationStateGroup(data.map(() => "preactive"));
-                        setAnimated(true);
-                        setLoaded(true);
-                      }, 2000);
-                    }
-                    setAnimationStateGroup((prev) => {
-                      const newState = [...prev];
-                      newState[i] = "idle";
-                      return newState;
-                    });
-                    // setAnimated(true);
-                    // setLoaded(true);
-                  }
-                  if (animationStateGroup[i] == "preactive") {
-                    setAnimationState("active");
-                    setAnimationStateGroup((prev) => {
-                      const newState = [...prev];
-                      newState[i] = "active";
-                      return newState;
-                    });
-                  }
-                }}
-              >
-                <span className="sr-only">{spread.title}</span>
-              </motion.a>
-            </motion.div>
-          ))}
+                  setAnimationStateGroup((prev) => {
+                    const newState = [...prev];
+                    newState[i] = "idle";
+                    return newState;
+                  });
+                }
+                if (animationStateGroup[i] == "preactive") {
+                  setAnimationState("active");
+                  setAnimationStateGroup((prev) => {
+                    const newState = [...prev];
+                    newState[i] = "active";
+                    return newState;
+                  });
+                  setAnimated(true);
+                  setLoaded(true);
+                }
+              }}
+            >
+              <span className="sr-only">{spread.title}</span>
+            </motion.a>
+          </motion.div>
+        ))}
+      </motion.div>
+      <motion.div className="grid grid-cols-[1fr_2.25rem] gap-x-1 landscape:flex-col flex-1">
+        <div>
+          {item.name !== "" ? (
+            <Fragment>
+              <div className="flex flex-col">
+                <h2 className="text-pizzi-lg">{item.name}</h2>
+                <h3 className="text-pizzi-md">
+                  {data.find((d) => d.title === item.name)?.subtitle}
+                </h3>
+              </div>
+            </Fragment>
+          ) : null}
+        </div>
+        <motion.div
+          variants={{
+            preload: { opacity: 0 },
+            active: { opacity: 1, transition: { delay: 0.3 } },
+          }}
+        >
+          <Link href={item.href}>
+            <motion.span
+              className="block size-9 ml-auto rounded-full"
+              animate={{
+                backgroundColor:
+                  item.href !== "" ? "var(--foreground)" : "var(--disabled)",
+              }}
+            ></motion.span>
+            <span className="sr-only">{item.name}</span>
+          </Link>
         </motion.div>
-      </div>
-      <div className="flex landscape:flex-col ">
-        {item.name !== "" ? (
-          <Fragment>
-            <div className="flex flex-col">
-              <h2 className="text-pizzi-lg">{item.name}</h2>
-              <h3 className="text-pizzi-md">
-                {data.find((d) => d.title === item.name)?.subtitle}
-              </h3>
-            </div>
-            <Link
-              href={item.href}
-              className="bg-foreground size-9  max-sm:portrait:ml-auto rounded-full"
-            />
-          </Fragment>
-        ) : null}
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 };
