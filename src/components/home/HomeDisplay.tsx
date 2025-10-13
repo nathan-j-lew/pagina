@@ -100,7 +100,7 @@ export const HomeDisplay = ({
 
   return (
     <motion.div
-      className="flex flex-col flex-1 min-h-fit max-sm:landscape:flex-row max-sm:justify-center items-center gap-3 size-full"
+      className="flex flex-col sm:flex-row flex-1 min-h-fit max-sm:landscape:flex-row max-sm:justify-center items-center gap-3 size-full"
       initial={"preload"}
       animate={animationState}
       exit={{
@@ -108,7 +108,7 @@ export const HomeDisplay = ({
         y: "-10%",
       }}
     >
-      <motion.div className="flex-1 flex flex-col items-center justify-end">
+      <motion.div className="flex flex-col sm:flex-row flex-1 items-center justify-end">
         <motion.div
           variants={{
             preload: { opacity: 0 },
@@ -123,122 +123,121 @@ export const HomeDisplay = ({
           </Link>
         </motion.div>
       </motion.div>
-      <motion.div
-        className="flex-none aspect-square border-2 flex gap-x-1 size-full max-w-[calc(100svmin-2*var(--paddingLocal))] max-h-[calc(100svmin-2*var(--paddingLocal))]"
-        layoutId="background"
-        key="nav_container"
-        variants={{
-          preload: { borderColor: "#88888800" },
-          active: {
-            borderColor: "var(--foreground)",
-            transition: { when: "afterChildren" },
-          },
-        }}
-      >
-        {data.map((spread, i) => (
-          <motion.div
-            key={`nav--${spread.slug}`}
-            className={`size-full bg-[${spread.hex}] relative flex flex-col perspective-near`}
-            layout
-            style={{
-              justifyContent:
-                animationState == "active" ? spread.position : "center",
-            }}
-            // variants={{}}
-          >
-            <motion.a
-              initial={"preload"}
-              animate={animationStateGroup[i]}
-              variants={bars}
-              className={clsx(`test absolute w-full transform`)}
-              data-position={spread.position}
+      <div className="flex-none h-full">
+        <motion.div
+          className="aspect-square border-2 flex gap-x-1 size-full max-w-[calc(100svmin-2*var(--paddingLocal))] max-h-[calc(100svmin-2*var(--paddingLocal))]"
+          layoutId="background"
+          key="nav_container"
+          variants={{
+            preload: { borderColor: "#88888800" },
+            active: {
+              borderColor: "var(--foreground)",
+              transition: { when: "afterChildren" },
+            },
+          }}
+        >
+          {data.map((spread, i) => (
+            <motion.div
+              key={`nav--${spread.slug}`}
+              className={`size-full bg-[${spread.hex}] relative flex flex-col perspective-near`}
               layout
-              key={`nav_inner--${spread.slug}`}
-              custom={{ index: i, position: spread.position }}
-              onMouseEnter={() => {
-                if (animated)
-                  itemHandler({
-                    index: i,
-                    name: spread.title,
-                    href: `/${spread.slug}`,
-                  });
+              style={{
+                justifyContent:
+                  animationState == "active" ? spread.position : "center",
               }}
-              href={`/${spread.slug}`}
-              onClick={(e) => {
-                e.preventDefault();
-                if (size.width >= 960) {
-                  router.push(`/${spread.slug}`);
-                } else {
+              // variants={{}}
+            >
+              <motion.a
+                initial={"preload"}
+                animate={animationStateGroup[i]}
+                variants={bars}
+                className={clsx(`test absolute w-full transform`)}
+                data-position={spread.position}
+                layout
+                key={`nav_inner--${spread.slug}`}
+                custom={{ index: i, position: spread.position }}
+                onMouseEnter={() => {
                   if (animated)
                     itemHandler({
                       index: i,
                       name: spread.title,
                       href: `/${spread.slug}`,
                     });
-                }
-              }}
-              style={{
-                backgroundColor:
-                  item.index == i ? "var(--active)" : "var(--foreground)",
-              }}
-              onAnimationComplete={() => {
-                if (animationStateGroup[i] == "loadIn") {
-                  if (i == data.length - 1) {
-                    setTimeout(() => {
-                      setAnimationState("preactive");
-                      setAnimationStateGroup(data.map(() => "preactive"));
-                    }, 2000);
+                }}
+                href={`/${spread.slug}`}
+                onClick={(e) => {
+                  e.preventDefault();
+                  if (size.width >= 960) {
+                    router.push(`/${spread.slug}`);
+                  } else {
+                    if (animated)
+                      itemHandler({
+                        index: i,
+                        name: spread.title,
+                        href: `/${spread.slug}`,
+                      });
                   }
-                  setAnimationStateGroup((prev) => {
-                    const newState = [...prev];
-                    newState[i] = "idle";
-                    return newState;
-                  });
-                }
-                if (animationStateGroup[i] == "preactive") {
-                  setAnimationState("active");
-                  setAnimationStateGroup((prev) => {
-                    const newState = [...prev];
-                    newState[i] = "active";
-                    return newState;
-                  });
-                  setAnimated(true);
-                  setLoaded(true);
-                }
-              }}
-            >
-              <span className="sr-only">{spread.title}</span>
-            </motion.a>
-          </motion.div>
-        ))}
-      </motion.div>
+                }}
+                style={{
+                  backgroundColor:
+                    item.index == i ? "var(--active)" : "var(--foreground)",
+                }}
+                onAnimationComplete={() => {
+                  if (animationStateGroup[i] == "loadIn") {
+                    if (i == data.length - 1) {
+                      setTimeout(() => {
+                        setAnimationState("preactive");
+                        setAnimationStateGroup(data.map(() => "preactive"));
+                      }, 2000);
+                    }
+                    setAnimationStateGroup((prev) => {
+                      const newState = [...prev];
+                      newState[i] = "idle";
+                      return newState;
+                    });
+                  }
+                  if (animationStateGroup[i] == "preactive") {
+                    setAnimationState("active");
+                    setAnimationStateGroup((prev) => {
+                      const newState = [...prev];
+                      newState[i] = "active";
+                      return newState;
+                    });
+                    setAnimated(true);
+                    setLoaded(true);
+                  }
+                }}
+              >
+                <span className="sr-only">{spread.title}</span>
+              </motion.a>
+            </motion.div>
+          ))}
+        </motion.div>
+      </div>
 
-      <motion.div className="flex flex-col items-center gap-3 flex-1">
+      <motion.div className="flex flex-col sm:flex-row flex-1 items-center gap-3 relative ">
         <motion.div
           variants={{
             preload: { opacity: 0 },
             active: { opacity: 1, transition: { delay: 0.3 } },
           }}
         >
-          <Link href={item.href}>
+          <Link href={item.href} className="block ">
             <motion.span className="block size-12">
               <motion.span
-                className="block size-full scale-105 rounded-full"
-                animate={{
-                  backgroundColor:
-                    item.href !== "" ? "var(--foreground)" : "var(--disabled)",
+                className="block size-full scale-105 rounded-full sm:border-2"
+                style={{
+                  backgroundColor: item.href
+                    ? "var(--active)"
+                    : "var(--foreground)",
                 }}
               />
+              <span className="absolute top-full text-pizzi-lg my-2">
+                {item.name}
+              </span>
             </motion.span>
             <span className="sr-only">{item.name}</span>
           </Link>
-        </motion.div>
-        <motion.div>
-          {item.name !== "" ? (
-            <Link href={item.href} className="text-pizzi-lg">
-              {item.name}
-            </Link>
-          ) : null}
         </motion.div>
       </motion.div>
     </motion.div>
