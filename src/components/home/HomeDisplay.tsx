@@ -98,9 +98,13 @@ export const HomeDisplay = ({
     }),
   };
 
+  useEffect(() => {
+    if (animated) setTimeout(() => setLoaded(true), 1000);
+  }, [animated]);
+
   return (
     <motion.div
-      className="flex flex-col sm:flex-row flex-1 min-h-fit max-sm:landscape:flex-row max-sm:justify-center items-center gap-3 size-full"
+      className="flex flex-col sm:grid sm:grid-cols-6 flex-1 min-h-fit max-sm:landscape:flex-row max-sm:justify-center items-center gap-3 size-full"
       initial={"preload"}
       animate={animationState}
       exit={{
@@ -123,9 +127,9 @@ export const HomeDisplay = ({
           </Link>
         </motion.div>
       </motion.div>
-      <div className="flex-none h-full">
+      <div className="w-full flex flex-col justify-center items-center">
         <motion.div
-          className="aspect-square border-2 flex gap-x-1 size-full max-w-[calc(100svmin-2*var(--paddingLocal))] max-h-[calc(100svmin-2*var(--paddingLocal))]"
+          className="aspect-square border-2 flex gap-x-1 w-full h-auto max-w-[30rem]"
           layoutId="background"
           key="nav_container"
           variants={{
@@ -139,7 +143,7 @@ export const HomeDisplay = ({
           {data.map((spread, i) => (
             <motion.div
               key={`nav--${spread.slug}`}
-              className={`size-full bg-[${spread.hex}] relative flex flex-col perspective-near`}
+              className={`size-full bg-[${spread.hex}] relative flex flex-col`}
               layout
               style={{
                 justifyContent:
@@ -184,17 +188,17 @@ export const HomeDisplay = ({
                 }}
                 onAnimationComplete={() => {
                   if (animationStateGroup[i] == "loadIn") {
+                    setAnimationStateGroup((prev) => {
+                      const newState = [...prev];
+                      newState[i] = "idle";
+                      return newState;
+                    });
                     if (i == data.length - 1) {
                       setTimeout(() => {
                         setAnimationState("preactive");
                         setAnimationStateGroup(data.map(() => "preactive"));
                       }, 2000);
                     }
-                    setAnimationStateGroup((prev) => {
-                      const newState = [...prev];
-                      newState[i] = "idle";
-                      return newState;
-                    });
                   }
                   if (animationStateGroup[i] == "preactive") {
                     setAnimationState("active");
@@ -203,8 +207,9 @@ export const HomeDisplay = ({
                       newState[i] = "active";
                       return newState;
                     });
+                  }
+                  if (animationState == "active" && i == data.length - 1) {
                     setAnimated(true);
-                    setLoaded(true);
                   }
                 }}
               >
@@ -225,11 +230,11 @@ export const HomeDisplay = ({
           <Link href={item.href} className="block ">
             <motion.span className="block size-12">
               <motion.span
-                className="block size-full scale-105 rounded-full sm:border-2"
+                className="block size-full scale-105 rounded-full "
                 style={{
                   backgroundColor: item.href
-                    ? "var(--active)"
-                    : "var(--foreground)",
+                    ? "var(--foreground)"
+                    : "var(--disabled)",
                 }}
               />
               <span className="absolute top-full text-pizzi-lg my-2">
