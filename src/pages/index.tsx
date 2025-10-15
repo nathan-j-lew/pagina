@@ -68,9 +68,9 @@ export default function Home({ data }: { data: SpreadData[] }) {
 
   return (
     <Fragment>
-      <motion.main className="items-center relative max-sm:max-h-svh flex flex-col max-sm:portrait:flex-row w-max">
+      <motion.main className="h-svh items-center relative max-sm:max-h-svh flex flex-col max-sm:portrait:flex-row w-max">
         <motion.section
-          className="fixed left-0 top-0 w-full h-svh flex flex-col overflow-auto"
+          className="fixed left-0 top-0 w-full h-svh flex flex-col overflow-auto "
           layoutScroll
         >
           <div

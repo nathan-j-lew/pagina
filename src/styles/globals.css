@@ -30,6 +30,9 @@
   /* --font-mono: var(--font-geist-mono); */
 }
 
+@custom-variant hsm (@media(min-height: 20rem));
+@custom-variant ratio-test (@media(min-aspect-ratio: 2/1));
+
 html {
   /* scrollbar-gutter: stable; */
 }

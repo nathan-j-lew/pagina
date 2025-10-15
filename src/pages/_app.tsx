@@ -161,7 +161,7 @@ export default function App({ Component, pageProps }: AppProps) {
                   ? "vertical"
                   : "horizontal",
             }}
-            className="w-screen min-h-svh overflow-x-auto overflow-y-hidden sm:overflow-y-auto sm:overflow-x-hidden"
+            className="w-screen min-h-svh overflow-x-auto overflow-y-hidden sm:overflow-y-auto sm:overflow-x-hidden ratio-test:bg-blue-400"
             ref={ref}
           >
             <MousePositionContext
