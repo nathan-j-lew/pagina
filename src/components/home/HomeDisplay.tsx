@@ -53,7 +53,7 @@ export const HomeDisplay = ({
 
   const [animated, setAnimated] = useState(loaded);
   const router = useRouter();
-  const { size } = useContext(ResizeContext);
+  const { size, mini } = useContext(ResizeContext);
 
   const { setLoaded } = useContext(LoaderContext);
 
@@ -92,7 +92,12 @@ export const HomeDisplay = ({
     active: (custom: { index: number; position: string }) => ({
       translateY: "0%",
       opacity: 1,
-      height: custom.position == "start" ? "80%" : "60%",
+      height:
+        mini && item.href != ""
+          ? "100%"
+          : custom.position == "start"
+          ? "80%"
+          : "60%",
       // transition: {
       //   delay: custom.index * 0.1,
       // },
@@ -126,7 +131,7 @@ export const HomeDisplay = ({
 
   return (
     <motion.div
-      className="flex flex-col flex-1 min-h-fit gap-12 size-full sm:grid sm:grid-cols-6 sm:gap-3"
+      className="flex flex-col flex-1 min-h-fit gap-12 size-full hsm:sm:grid hsm:sm:grid-cols-6 hsm:sm:gap-3"
       initial={"preload"}
       animate={animationState}
       exit={{
@@ -134,7 +139,7 @@ export const HomeDisplay = ({
         y: "-10%",
       }}
     >
-      <div className="px-(--paddingLocal) landscape:py-(--paddingLocal) max-sm:portrait:flex-2 flex flex-col landscape:flex-row gap-12 sm:col-span-4">
+      <div className="px-(--paddingLocal) landscape:py-(--paddingLocal) max-sm:flex-2 landscape:flex-1 flex flex-col landscape:flex-row gap-12 hsm:sm:col-span-4">
         <motion.div className="flex-1 relative w-full">
           <motion.div
             variants={{
@@ -151,15 +156,17 @@ export const HomeDisplay = ({
             </Link>
           </motion.div>
         </motion.div>
-        <div className="w-full flex flex-col justify-center items-center landscape:items-end landscape:flex-1">
+        <div className="size-full flex flex-col justify-center items-center landscape:justify-start grow overflow-hidden container-size">
           <motion.div
-            className="aspect-square border-2 flex gap-x-1 w-full h-auto max-w-[30rem]"
+            className="contained-portrait:w-full contained-portrait:h-auto contained-landscape:h-full contained-landscape:w-auto aspect-square border-2 flex gap-x-1 max-w-[30rem] max-h-[30rem]"
             layoutId="background"
             key="nav_container"
             variants={{
               preload: { borderColor: "#88888800" },
               active: {
                 borderColor: "var(--foreground)",
+                // aspectRatio: mini && item.name !== "" ? "5 / 1" : "1 / 1",
+                // height: mini && item.name !== "" ? "20%" : "100%",
                 transition: { when: "afterChildren" },
               },
             }}
@@ -183,7 +190,11 @@ export const HomeDisplay = ({
                   data-position={spread.position}
                   layout
                   key={`nav_inner--${spread.slug}`}
-                  custom={{ index: i, position: spread.position }}
+                  custom={{
+                    index: i,
+                    position: spread.position,
+                    // mini: mini && item.name !== "",
+                  }}
                   onMouseEnter={() => {
                     if (animated)
                       itemHandler({
@@ -196,7 +207,7 @@ export const HomeDisplay = ({
                   href={`/${spread.slug}`}
                   onClick={(e) => {
                     e.preventDefault();
-                    if (size.width >= 960) {
+                    if (size.width >= 960 && !mini) {
                       router.push(`/${spread.slug}`);
                     } else {
                       if (animated) {
@@ -249,7 +260,7 @@ export const HomeDisplay = ({
         </div>
       </div>
 
-      <motion.div className="px-(--paddingLocal) flex flex-col flex-1 justify-end items-start gap-3 w-full sm:col-span-2">
+      <motion.div className="pointer-events-none landscape:fixed bottom-0 left-0 w-full hsm:static px-(--paddingLocal) flex flex-col flex-1 justify-end items-start gap-3 hsm:sm:col-span-2">
         <motion.div
           variants={{
             preload: { opacity: 0 },
@@ -261,7 +272,7 @@ export const HomeDisplay = ({
                   }
                 : { opacity: 0 },
           }}
-          className="w-full max-w-[30rem] mx-auto sm:landscape:hidden"
+          className="w-full max-w-[30rem] mx-auto hsm:sm:landscape:hidden"
         >
           <Link href={item.href} className="pointer-events-none h-15 block">
             <hgroup className="flex flex-col items-start">
@@ -272,7 +283,7 @@ export const HomeDisplay = ({
         </motion.div>
         <Link
           href={item.href}
-          className="block w-screen sm:w-full -mx-(--paddingLocal) h-24 sm:h-full"
+          className="block w-full hsm:sm:w-full h-24 hsm:sm:h-full"
         >
           <motion.span
             className="block bg-warm-red size-full"

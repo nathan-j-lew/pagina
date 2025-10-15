@@ -74,3 +74,10 @@ html.lenis body {
   transition-duration: 1ms;
   transition-behavior: allow-discrete;
 }
+
+@utility container-size {
+  container-type: size;
+}
+
+@custom-variant contained-portrait (@container (orientation: portrait));
+@custom-variant contained-landscape (@container (orientation: landscape));

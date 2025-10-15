@@ -138,7 +138,11 @@ export default function App({ Component, pageProps }: AppProps) {
   return (
     <Fragment>
       <ResizeContext
-        value={{ size: resize.size, orientation: resize.orientation }}
+        value={{
+          size: resize.size,
+          orientation: resize.orientation,
+          mini: resize.size.height < 640,
+        }}
       >
         {/* <div className="fixed z-100 top-0 right-0 portrait:bg-red-500 bg-green-500">
           <div>
@@ -161,7 +165,7 @@ export default function App({ Component, pageProps }: AppProps) {
                   ? "vertical"
                   : "horizontal",
             }}
-            className="w-screen min-h-svh overflow-x-auto overflow-y-hidden sm:overflow-y-auto sm:overflow-x-hidden ratio-square:bg-blue-400"
+            className="w-screen min-h-svh overflow-x-auto overflow-y-hidden hsm:sm:overflow-y-auto hsm:sm:overflow-x-hidden"
             ref={ref}
           >
             <MousePositionContext
