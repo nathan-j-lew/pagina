@@ -24,7 +24,9 @@
   --text-pizzi-base--line-height: var(--pizzi-web-base--leading);
   --text-pizzi-lg: var(--pizzi-web-lg);
   --text-pizzi-lg--line-height: var(--pizzi-web-lg--leading);
+  --breakpoint-xs: 30rem;
   --aspect-book: 236 / 216;
+  --aspect-logo: 86 / 18;
   /* --font-mono: var(--font-geist-mono); */
 }
 

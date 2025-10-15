@@ -31,9 +31,15 @@ export const HomeDisplay = ({
   item: {
     index: number;
     name: string;
+    desc: string;
     href: string;
   };
-  itemHandler: (item: { index: number; name: string; href: string }) => void;
+  itemHandler: (item: {
+    index: number;
+    name: string;
+    desc: string;
+    href: string;
+  }) => void;
 }) => {
   type STATES = "loadIn" | "idle" | "preactive" | "active";
   const [animationStateGroup, setAnimationStateGroup] = useState<STATES[]>(
@@ -112,16 +118,16 @@ export const HomeDisplay = ({
         y: "-10%",
       }}
     >
-      <motion.div className="flex flex-col sm:flex-row flex-1 items-center justify-end">
+      <motion.div className="flex-1 relative w-full">
         <motion.div
           variants={{
             preload: { opacity: 0 },
             active: { opacity: 1, transition: { delay: 0.3 } },
           }}
         >
-          <Link href="/about">
-            <motion.span className="block size-12">
-              <motion.span className="block size-full scale-105 rounded-full bg-foreground" />
+          <Link href="/about" className="sticky top-0 left-0">
+            <motion.span className="block aspect-logo h-9">
+              <motion.span className="block size-full bg-foreground" />
             </motion.span>
             <span className="sr-only">About</span>
           </Link>
@@ -165,6 +171,7 @@ export const HomeDisplay = ({
                     itemHandler({
                       index: i,
                       name: spread.title,
+                      desc: spread.subtitle,
                       href: `/${spread.slug}`,
                     });
                 }}
@@ -178,6 +185,7 @@ export const HomeDisplay = ({
                       itemHandler({
                         index: i,
                         name: spread.title,
+                        desc: spread.subtitle,
                         href: `/${spread.slug}`,
                       });
                   }
@@ -220,30 +228,27 @@ export const HomeDisplay = ({
         </motion.div>
       </div>
 
-      <motion.div className="flex flex-col sm:flex-row flex-1 items-center gap-3 relative ">
-        <motion.div
-          variants={{
-            preload: { opacity: 0 },
-            active: { opacity: 1, transition: { delay: 0.3 } },
-          }}
-        >
-          <Link href={item.href} className="block ">
-            <motion.span className="block size-12">
-              <motion.span
-                className="block size-full scale-105 rounded-full "
-                style={{
-                  backgroundColor: item.href
-                    ? "var(--foreground)"
-                    : "var(--disabled)",
-                }}
-              />
-              <span className="absolute top-full text-pizzi-lg my-2">
-                {item.name}
-              </span>
-            </motion.span>
-            <span className="sr-only">{item.name}</span>
-          </Link>
-        </motion.div>
+      <motion.div
+        variants={{
+          preload: { opacity: 0 },
+          active: { opacity: 1, transition: { delay: 0.3 } },
+        }}
+        className="flex flex-col sm:flex-row flex-1 justify-end items-center gap-3 w-full"
+      >
+        <Link href={item.href} className="block w-full">
+          {item.name !== "" && (
+            <span className="block mb-3 pointer-events-none">
+              <hgroup className="flex flex-col items-start">
+                <h3 className="text-pizzi-lg pointer-events-auto">
+                  {item.name}
+                </h3>
+                <p className="pointer-events-auto">{item.desc}</p>
+              </hgroup>
+            </span>
+          )}
+          <motion.span className="block h-24 bg-warm-red" />
+          <span className="sr-only">{item.name}</span>
+        </Link>
       </motion.div>
     </motion.div>
   );
