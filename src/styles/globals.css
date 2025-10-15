@@ -30,7 +30,11 @@
   /* --font-mono: var(--font-geist-mono); */
 }
 
-@custom-variant hsm (@media(min-height: 20rem));
+@custom-variant hxxs (@media(min-height: 20rem));
+@custom-variant hxs (@media(min-height: 30rem));
+@custom-variant hsm (@media(min-height: 40rem));
+@custom-variant hmd (@media(min-height: 48rem));
+@custom-variant ratio-square (@media(max-aspect-ratio: 1/1));
 @custom-variant ratio-test (@media(min-aspect-ratio: 2/1));
 
 html {
