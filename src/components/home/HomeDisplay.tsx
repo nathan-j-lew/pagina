@@ -149,28 +149,50 @@ export const HomeDisplay = ({
             className="w-full portrait:max-w-[30rem] portrait:mx-auto"
           >
             <Link href="/about" className="">
-              <motion.span className="block aspect-logo h-9 max-xs:landscape:h-6">
+              <motion.span className="block aspect-logo hsm:h-9 h-6">
                 <motion.span className="block size-full bg-foreground" />
               </motion.span>
               <span className="sr-only">About</span>
             </Link>
           </motion.div>
         </motion.div>
-        <div className="size-full flex flex-col justify-center items-center landscape:justify-start grow overflow-hidden container-size">
+        <div className="size-full flex flex-col justify-center items-center landscape:items-end landscape:justify-start grow overflow-hidden container-size">
           <motion.div
-            className="contained-portrait:w-full contained-portrait:h-auto contained-landscape:h-full contained-landscape:w-auto aspect-square border-2 flex gap-x-1 max-w-[30rem] max-h-[30rem]"
+            className={clsx(
+              "contained-portrait:w-full contained-portrait:h-auto contained-landscape:w-auto",
+              mini && item.name !== ""
+                ? "contained-landscape:h-1/5 aspect-5/1"
+                : "contained-landscape:h-full aspect-square",
+              // "contained-landscape:h-full",
+              // "aspect-square",
+              "relative",
+              "flex",
+              "gap-x-1",
+              "max-w-[30rem]",
+              "max-h-[30rem]",
+              "border-2"
+            )}
             layoutId="background"
+            // layout="size"
             key="nav_container"
             variants={{
-              preload: { borderColor: "#88888800" },
+              preload: {
+                borderColor: "#88888800",
+                // transformOrigin: "50% 0% 0px",
+              },
               active: {
                 borderColor: "var(--foreground)",
                 // aspectRatio: mini && item.name !== "" ? "5 / 1" : "1 / 1",
+                // scale: mini && item.name !== "" ? 0.2 : 1,
+
                 // height: mini && item.name !== "" ? "20%" : "100%",
-                transition: { when: "afterChildren" },
+                // scaleY: mini && item.name !== "" ? 0.2 : 1,
+                // transformOrigin: "50% 0% 0px",
+                // transition: { when: "afterChildren" },
               },
             }}
           >
+            {/* <motion.div className="absolute size-full border-2" /> */}
             {data.map((spread, i) => (
               <motion.div
                 key={`nav--${spread.slug}`}
