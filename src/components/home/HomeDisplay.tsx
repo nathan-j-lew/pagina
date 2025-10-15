@@ -126,7 +126,7 @@ export const HomeDisplay = ({
 
   return (
     <motion.div
-      className="flex flex-col sm:grid sm:grid-cols-6 flex-1 min-h-fit max-sm:landscape:flex-row max-sm:justify-center items-center gap-3 size-full"
+      className="flex flex-col sm:grid sm:grid-cols-6 flex-1 min-h-fit max-sm:landscape:flex-row max-sm:justify-center items-center gap-12 size-full"
       initial={"preload"}
       animate={animationState}
       exit={{
@@ -140,6 +140,7 @@ export const HomeDisplay = ({
             preload: { opacity: 0 },
             active: { opacity: 1, transition: { delay: 0.3 } },
           }}
+          className="w-full max-w-[30rem] mx-auto"
         >
           <Link href="/about" className="">
             <motion.span className="block aspect-logo h-9">
@@ -246,7 +247,7 @@ export const HomeDisplay = ({
         </motion.div>
       </div>
 
-      <motion.div className="px-(--paddingLocal) flex flex-col sm:flex-row flex-1 justify-end items-start gap-3 w-full -mx-4 ">
+      <motion.div className="px-(--paddingLocal) flex flex-col sm:flex-row flex-1 justify-end items-start gap-3 w-full">
         <motion.div
           variants={{
             preload: { opacity: 0 },
@@ -258,6 +259,7 @@ export const HomeDisplay = ({
                   }
                 : { opacity: 0 },
           }}
+          className="w-full max-w-[30rem] mx-auto"
         >
           <Link href={item.href} className="pointer-events-none h-15 block">
             <hgroup className="flex flex-col items-start">
