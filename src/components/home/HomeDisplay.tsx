@@ -19,6 +19,8 @@ import { AnimateParams, useMotionTimeline } from "@/hooks/useMotionTimeline";
 import clsx from "clsx";
 import { LoaderContext } from "@/context/Loader/LoaderContext";
 import { ResizeContext } from "@/context/Resize/ResizeContext";
+import { delay } from "motion";
+import { useLenis } from "lenis/react";
 
 export const HomeDisplay = ({
   data,
@@ -108,6 +110,20 @@ export const HomeDisplay = ({
     if (animated) setTimeout(() => setLoaded(true), 1000);
   }, [animated]);
 
+  useEffect(() => {
+    const handleKeydown = (e: KeyboardEvent) => {
+      if (e.key == ";") {
+        itemHandler({ index: -1, name: "", desc: "", href: "" });
+      }
+    };
+    window.addEventListener("keydown", handleKeydown);
+    return () => {
+      window.removeEventListener("keydown", handleKeydown);
+    };
+  }, []);
+
+  const lenis = useLenis();
+
   return (
     <motion.div
       className="flex flex-col sm:grid sm:grid-cols-6 flex-1 min-h-fit max-sm:landscape:flex-row max-sm:justify-center items-center gap-3 size-full"
@@ -118,14 +134,14 @@ export const HomeDisplay = ({
         y: "-10%",
       }}
     >
-      <motion.div className="flex-1 relative w-full">
+      <motion.div className="px-(--paddingLocal) flex-1 relative w-full">
         <motion.div
           variants={{
             preload: { opacity: 0 },
             active: { opacity: 1, transition: { delay: 0.3 } },
           }}
         >
-          <Link href="/about" className="sticky top-0 left-0">
+          <Link href="/about" className="">
             <motion.span className="block aspect-logo h-9">
               <motion.span className="block size-full bg-foreground" />
             </motion.span>
@@ -133,7 +149,7 @@ export const HomeDisplay = ({
           </Link>
         </motion.div>
       </motion.div>
-      <div className="w-full flex flex-col justify-center items-center">
+      <div className="px-(--paddingLocal) w-full flex flex-col justify-center items-center">
         <motion.div
           className="aspect-square border-2 flex gap-x-1 w-full h-auto max-w-[30rem]"
           layoutId="background"
@@ -181,13 +197,15 @@ export const HomeDisplay = ({
                   if (size.width >= 960) {
                     router.push(`/${spread.slug}`);
                   } else {
-                    if (animated)
+                    if (animated) {
                       itemHandler({
                         index: i,
                         name: spread.title,
                         desc: spread.subtitle,
                         href: `/${spread.slug}`,
                       });
+                      // if (lenis) lenis.scrollTo(lenis.limit);
+                    }
                   }
                 }}
                 style={{
@@ -228,26 +246,44 @@ export const HomeDisplay = ({
         </motion.div>
       </div>
 
-      <motion.div
-        variants={{
-          preload: { opacity: 0 },
-          active: { opacity: 1, transition: { delay: 0.3 } },
-        }}
-        className="flex flex-col sm:flex-row flex-1 justify-end items-center gap-3 w-full"
-      >
-        <Link href={item.href} className="block w-full">
-          {item.name !== "" && (
-            <span className="block mb-3 pointer-events-none">
-              <hgroup className="flex flex-col items-start">
-                <h3 className="text-pizzi-lg pointer-events-auto">
-                  {item.name}
-                </h3>
-                <p className="pointer-events-auto">{item.desc}</p>
-              </hgroup>
-            </span>
-          )}
-          <motion.span className="block h-24 bg-warm-red" />
-          <span className="sr-only">{item.name}</span>
+      <motion.div className="px-(--paddingLocal) flex flex-col sm:flex-row flex-1 justify-end items-start gap-3 w-full -mx-4 ">
+        <motion.div
+          variants={{
+            preload: { opacity: 0 },
+            active:
+              animated && item.name !== ""
+                ? {
+                    opacity: 1,
+                    transition: { ease: "easeOut" },
+                  }
+                : { opacity: 0 },
+          }}
+        >
+          <Link href={item.href} className="pointer-events-none h-15 block">
+            <hgroup className="flex flex-col items-start">
+              <h3 className="text-pizzi-lg pointer-events-auto">{item.name}</h3>
+              <p className="pointer-events-auto">{item.desc}</p>
+            </hgroup>
+          </Link>
+        </motion.div>
+        <Link
+          href={item.href}
+          className="block w-screen -mx-(--paddingLocal) h-24"
+        >
+          <motion.span
+            className="block bg-warm-red size-full"
+            variants={{
+              preload: { clipPath: "inset(100% 0% 0% 0%)" },
+              active:
+                animated && item.name !== ""
+                  ? {
+                      clipPath: "inset(0% 0% 0% 0%)",
+                      transition: { ease: circOut },
+                    }
+                  : { clipPath: "inset(100% 0% 0% 0%)" },
+            }}
+          />
+          <span className="sr-only">Open {item.name}</span>
         </Link>
       </motion.div>
     </motion.div>
