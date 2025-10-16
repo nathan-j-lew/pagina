@@ -139,8 +139,8 @@ export const HomeDisplay = ({
         y: "-10%",
       }}
     >
-      <div className="px-(--paddingLocal) landscape:py-(--paddingLocal) max-sm:flex-2 landscape:flex-1 flex flex-col landscape:flex-row gap-12 hsm:sm:col-span-4">
-        <motion.div className="flex-1 relative w-full">
+      <div className=" max-sm:flex-2 landscape:flex-1 flex flex-col landscape:flex-row gap-12 hsm:sm:col-span-4">
+        <motion.div className="flex-1 relative w-full hsm:sm:fixed">
           <motion.div
             variants={{
               preload: { opacity: 0 },
@@ -156,17 +156,25 @@ export const HomeDisplay = ({
             </Link>
           </motion.div>
         </motion.div>
-        <div className="size-full flex flex-col justify-center items-center landscape:items-end landscape:justify-start grow overflow-hidden container-size">
+        <div className="size-full flex flex-col justify-center items-center landscape:items-end landscape:justify-start sm:hsm:items-start sm:hsm:justify-center bg-red-500 grow overflow-hidden container-size">
           <motion.div
             className={clsx(
-              "bg-foreground p-0.5",
-              "contained-portrait:w-full contained-portrait:h-auto contained-landscape:w-auto",
+              "p-0.5",
+              "contained-portrait:w-full contained-portrait:h-auto contained-landscape:w-auto overflow-hidden",
               mini && item.name !== ""
                 ? "contained-landscape:h-1/5 aspect-5/1"
                 : "contained-landscape:h-full aspect-square",
               "max-w-[30rem]",
               "max-h-[30rem]"
             )}
+            variants={{
+              preload: {
+                background: "var(--background)",
+              },
+              active: {
+                background: "var(--foreground)",
+              },
+            }}
             layout
           >
             <motion.div
@@ -316,7 +324,7 @@ export const HomeDisplay = ({
         </motion.div>
         <Link
           href={item.href}
-          className="block w-full hsm:sm:w-full h-24 hsm:sm:h-full"
+          className="block w-full hsm:sm:w-full h-24 hsm:sm:h-full pointer-events-auto"
         >
           <motion.span
             className="block bg-warm-red size-full"
