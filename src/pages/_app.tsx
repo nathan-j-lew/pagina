@@ -60,15 +60,13 @@ export default function App({ Component, pageProps }: AppProps) {
     }
   };
 
-  // useEffect(() => {
-  //   updateSize();
+  useEffect(() => {
+    updateSize();
 
-  //   window.addEventListener("resize", updateSize);
+    window.addEventListener("resize", updateSize);
 
-  //   return () => {
-  //
-  //   };
-  // }, []);
+    return () => {};
+  }, []);
 
   useEffect(() => {
     const updateMousePosition = (e: MouseEvent) => {
@@ -80,6 +78,7 @@ export default function App({ Component, pageProps }: AppProps) {
         { x: e.touches[0].clientX, y: e.touches[0].clientY },
       ]);
     };
+
     if (loaded) {
       window.addEventListener("mousemove", updateMousePosition);
       window.addEventListener("touchmove", updateTaps);

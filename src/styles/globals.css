@@ -11,6 +11,9 @@
   --pizzi-web-base--leading: 1.263157;
   --pizzi-web-lg: 1.8125rem;
   --pizzi-web-lg--leading: 1.241379;
+
+  --col-width: calc((100vw - (5 * 0.75rem)) / 6);
+  --col-gap: 0.75rem;
 }
 
 @theme inline {
@@ -25,15 +28,29 @@
   --text-pizzi-lg: var(--pizzi-web-lg);
   --text-pizzi-lg--line-height: var(--pizzi-web-lg--leading);
   --breakpoint-xs: 30rem;
+  --breakpoint-sm: 40rem;
+  --breakpoint-md: 48rem;
+  --breakpoint-lg: 60rem;
+  --breakpoint-xl: 80rem;
+  --breakpoint-2xl: 90rem;
+  --breakpoint-3xl: 100rem;
+  --breakpoint-4xl: 120rem;
   --aspect-book: 236 / 216;
   --aspect-logo: 86 / 18;
+  --spacing-col-1: calc(var(--col-width) * 1 + var(--col-gap) * 0);
+  --spacing-col-2: calc(var(--col-width) * 2 + var(--col-gap) * 1);
+  --spacing-col-3: calc(var(--col-width) * 3 + var(--col-gap) * 2);
+  --spacing-col-4: calc(var(--col-width) * 4 + var(--col-gap) * 3);
+  --spacing-col-5: calc(var(--col-width) * 5 + var(--col-gap) * 4);
+  --spacing-col-6: calc(var(--col-width) * 6 + var(--col-gap) * 5);
   /* --font-mono: var(--font-geist-mono); */
 }
 
-@custom-variant hxxs (@media(min-height: 20rem));
-@custom-variant hxs (@media(min-height: 30rem));
+/* @custom-variant hxxs (@media(min-height: 20rem)); */
+/* @custom-variant hxs (@media(min-height: 30rem)); */
 @custom-variant hsm (@media(min-height: 40rem));
-@custom-variant hmd (@media(min-height: 48rem));
+@custom-variant max-hsm (@media(max-height: 40rem));
+/* @custom-variant hmd (@media(min-height: 48rem)); */
 @custom-variant ratio-square (@media(max-aspect-ratio: 1/1));
 @custom-variant ratio-test (@media(min-aspect-ratio: 2/1));
 

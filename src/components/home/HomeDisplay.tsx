@@ -1,6 +1,8 @@
 import { SpreadData } from "@/lib/spreads";
 import {
   AnimationSequence,
+  backIn,
+  backInOut,
   circInOut,
   circOut,
   easeInOut,
@@ -13,7 +15,14 @@ import {
 } from "motion/react";
 import Link from "next/link";
 import Logo from "@/assets/logo.svg";
-import { Fragment, useEffect, useState, useContext } from "react";
+import {
+  Fragment,
+  useEffect,
+  useState,
+  useContext,
+  CSSProperties,
+  use,
+} from "react";
 import { useRouter } from "next/router";
 import { AnimateParams, useMotionTimeline } from "@/hooks/useMotionTimeline";
 import clsx from "clsx";
@@ -43,7 +52,7 @@ export const HomeDisplay = ({
     href: string;
   }) => void;
 }) => {
-  type STATES = "loadIn" | "idle" | "preactive" | "active";
+  type STATES = "loadIn" | "idle" | "preactive" | "active" | "complete";
   const [animationStateGroup, setAnimationStateGroup] = useState<STATES[]>(
     data.map(() => (loaded ? "active" : "loadIn"))
   );
@@ -98,16 +107,16 @@ export const HomeDisplay = ({
           : custom.position == "start"
           ? "80%"
           : "60%",
-      // transition: {
-      //   delay: custom.index * 0.1,
-      // },
-      // transition: {
-      //   repeat: Infinity,
-      //   repeatType: "reverse",
-      //   delay: custom.index * 0.1,
-      //   duration: 1,
-      //   ease: "circInOut",
-      // },
+    }),
+    completed: (custom: { index: number; position: string }) => ({
+      translateY: "0%",
+      opacity: 1,
+      height:
+        mini && item.href != ""
+          ? "100%"
+          : custom.position == "start"
+          ? "80%"
+          : "60%",
     }),
   };
 
@@ -127,7 +136,11 @@ export const HomeDisplay = ({
     };
   }, []);
 
-  const lenis = useLenis();
+  useEffect(() => {
+    if (animationState == "complete") {
+      setAnimated(true);
+    }
+  }, [animationState]);
 
   return (
     <motion.div
@@ -139,7 +152,7 @@ export const HomeDisplay = ({
         y: "-10%",
       }}
     >
-      <div className=" max-sm:flex-2 landscape:flex-1 flex flex-col landscape:flex-row gap-12 hsm:sm:col-span-4">
+      <div className="relative max-sm:flex-2 landscape:flex-1 flex flex-col landscape:flex-row gap-12 hsm:sm:col-span-4 hsm:lg:col-span-3 hsm:3xl:col-span-2">
         <motion.div className="flex-1 relative w-full hsm:sm:fixed">
           <motion.div
             variants={{
@@ -156,26 +169,66 @@ export const HomeDisplay = ({
             </Link>
           </motion.div>
         </motion.div>
-        <div className="size-full flex flex-col justify-center items-center landscape:items-end landscape:justify-start sm:hsm:items-start sm:hsm:justify-center bg-red-500 grow overflow-hidden container-size">
+        <motion.div
+          // layoutRoot
+          className="relative flex flex-col justify-center items-center landscape:items-end landscape:justify-start sm:hsm:items-start sm:hsm:justify-center bg-red-500 grow overflow-hidden container-size"
+          variants={{
+            preload: {
+              position: "absolute",
+              width: "100vw",
+              height: "100vh",
+            },
+
+            complete: {
+              position: "absolute",
+              width: "100%",
+              height: "100%",
+              transition: {
+                delay: 0.2,
+                ease: circOut,
+              },
+            },
+          }}
+          layout
+          key="test1"
+        >
           <motion.div
             className={clsx(
-              "p-0.5",
+              "p-0.5 ",
               "contained-portrait:w-full contained-portrait:h-auto contained-landscape:w-auto overflow-hidden",
               mini && item.name !== ""
                 ? "contained-landscape:h-1/5 aspect-5/1"
                 : "contained-landscape:h-full aspect-square",
-              "max-w-[30rem]",
-              "max-h-[30rem]"
+              "max-w-[30rem] hsm:max-w-none hsm:sm:max-w-col-4 hsm:lg:max-w-col-3 hsm:3xl:max-w-col-2",
+              "max-h-[30rem] hsm:max-h-none hsm:sm:max-h-col-4 hsm:lg:max-h-col-3 hsm:3xl:max-h-col-2"
             )}
             variants={{
               preload: {
                 background: "var(--background)",
+                position: "fixed",
+                top: "50%",
+                left: "50%",
+                translate: "-50% -50%",
+                scale: 0.5,
               },
               active: {
                 background: "var(--foreground)",
+                scale: 1,
+              },
+              complete: {
+                background: "var(--foreground)",
+                position: "absolute",
+                top: "50%",
+                left: "50%",
+                translate: "-50% -50%",
+                scale: 1,
+                // transition: { duration: 2, ease: easeInOut },
               },
             }}
             layout
+            key="test2"
+            // layoutId="display"
+            // key="display"
           >
             <motion.div
               className={clsx(
@@ -188,29 +241,10 @@ export const HomeDisplay = ({
                 "gap-x-1"
                 // "border-2"
               )}
-              layoutId="background"
-              // layout="size"
+              // layoutId="background"
+              layout
               key="nav_container"
-              variants={{
-                preload: {
-                  // borderColor: "#88888800",
-                  // transformOrigin: "50% 0% 0px",
-                },
-                active: {
-                  // borderColor: "var(--foreground)",
-                  // aspectRatio: mini && item.name !== "" ? "5 / 1" : "1 / 1",
-                  // scale: mini && item.name !== "" ? 0.2 : 1,
-                  // height: mini && item.name !== "" ? "20%" : "100%",
-                  // scaleY: mini && item.name !== "" ? 0.2 : 1,
-                  // transformOrigin: "50% 0% 0px",
-                  // transition: { when: "afterChildren" },
-                },
-              }}
-              // style={{
-              //   boxShadow: "inset 0 0 0 2px var(--foreground)",
-              // }}
             >
-              {/* <motion.div className="absolute size-full border-2" /> */}
               {data.map((spread, i) => (
                 <motion.div
                   key={`nav--${spread.slug}`}
@@ -218,9 +252,10 @@ export const HomeDisplay = ({
                   layout
                   style={{
                     justifyContent:
-                      animationState == "active" ? spread.position : "center",
+                      animationState == "active" || animationState == "complete"
+                        ? spread.position
+                        : "center",
                   }}
-                  // variants={{}}
                 >
                   <motion.a
                     initial={"preload"}
@@ -288,7 +323,7 @@ export const HomeDisplay = ({
                         });
                       }
                       if (animationState == "active" && i == data.length - 1) {
-                        setAnimated(true);
+                        setAnimationState("complete");
                       }
                     }}
                   >
@@ -298,14 +333,14 @@ export const HomeDisplay = ({
               ))}
             </motion.div>
           </motion.div>
-        </div>
+        </motion.div>
       </div>
 
       <motion.div className="pointer-events-none landscape:fixed bottom-0 left-0 w-full hsm:static px-(--paddingLocal) flex flex-col flex-1 justify-end items-start gap-3 hsm:sm:col-span-2">
         <motion.div
           variants={{
             preload: { opacity: 0 },
-            active:
+            complete:
               animated && item.name !== ""
                 ? {
                     opacity: 1,
@@ -330,7 +365,7 @@ export const HomeDisplay = ({
             className="block bg-warm-red size-full"
             variants={{
               preload: { clipPath: "inset(100% 0% 0% 0%)" },
-              active:
+              complete:
                 animated && item.name !== ""
                   ? {
                       clipPath: "inset(0% 0% 0% 0%)",
