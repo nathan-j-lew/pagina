@@ -22,6 +22,7 @@ export default function App({ Component, pageProps }: AppProps) {
   const [resize, setResize] = useState<ResizeInfo>({
     size: { width: 0, height: 0 },
     orientation: "landscape",
+    mini: false,
   });
 
   const [loaded, setLoaded] = useState(false);
@@ -52,6 +53,7 @@ export default function App({ Component, pageProps }: AppProps) {
         size: { width: window.innerWidth, height: window.innerHeight },
         orientation:
           window.innerWidth > window.innerHeight ? "landscape" : "portrait",
+        mini: window.innerHeight < 640,
       });
       setLoaded(true);
       // console.log(lenis);
@@ -141,7 +143,7 @@ export default function App({ Component, pageProps }: AppProps) {
         value={{
           size: resize.size,
           orientation: resize.orientation,
-          mini: resize.size.height < 640,
+          mini: resize.mini,
         }}
       >
         {/* <div className="fixed z-100 top-0 right-0 portrait:bg-red-500 bg-green-500">
