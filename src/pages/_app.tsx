@@ -61,14 +61,6 @@ export default function App({ Component, pageProps }: AppProps) {
   };
 
   useEffect(() => {
-    updateSize();
-
-    window.addEventListener("resize", updateSize);
-
-    return () => {};
-  }, []);
-
-  useEffect(() => {
     const updateMousePosition = (e: MouseEvent) => {
       setMousePosition({ x: e.clientX, y: e.clientY });
     };
@@ -80,6 +72,7 @@ export default function App({ Component, pageProps }: AppProps) {
     };
 
     if (loaded) {
+      updateSize();
       window.addEventListener("mousemove", updateMousePosition);
       window.addEventListener("touchmove", updateTaps);
       window.addEventListener("resize", updateSize);
@@ -92,43 +85,6 @@ export default function App({ Component, pageProps }: AppProps) {
       }
     };
   }, [loaded]);
-
-  useEffect(() => {
-    const handleClick = (e: MouseEvent) => {
-      setClicked({ x: e.clientX, y: e.clientY });
-    };
-    const handleTap = (e: TouchEvent) => {
-      setTaps((prev) => [
-        { x: prev[1].x, y: prev[1].y },
-        { x: e.touches[0].clientX, y: e.touches[0].clientY },
-      ]);
-    };
-    window.addEventListener("mousedown", handleClick);
-    window.addEventListener("touchstart", handleTap);
-    return () => {
-      window.removeEventListener("mousedown", handleClick);
-      window.removeEventListener("touchstart", handleTap);
-    };
-  }, []);
-
-  useEffect(() => {
-    const handleClick = () => {
-      setClicked({ x: null, y: null });
-    };
-    const handleTap = () => {
-      setTaps([
-        { x: null, y: null },
-        { x: null, y: null },
-      ]);
-    };
-
-    window.addEventListener("mouseup", handleClick);
-    window.addEventListener("touchend", handleTap);
-    return () => {
-      window.removeEventListener("mouseup", handleClick);
-      window.removeEventListener("touchend", handleTap);
-    };
-  }, []);
 
   const ref = useRef<LenisRef>(null);
 

@@ -74,7 +74,7 @@ export default function Home({ data }: { data: SpreadData[] }) {
           layoutScroll
         >
           <div
-            className="landscape:max-w-[50rem] hsm:sm:max-w-none w-full mx-auto flex flex-col justify-center items-center h-full min-h-fit "
+            className="hsm:sm:max-w-none w-full mx-auto flex flex-col justify-center items-center h-full min-h-fit "
             style={{ "--paddingLocal": "1rem" } as React.CSSProperties}
           >
             <AnimatePresence>

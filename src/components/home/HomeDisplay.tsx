@@ -62,7 +62,7 @@ export const HomeDisplay = ({
 
   const [animated, setAnimated] = useState(loaded);
   const router = useRouter();
-  const { size, mini } = useContext(ResizeContext);
+  const { size, orientation, mini } = useContext(ResizeContext);
 
   const { setLoaded } = useContext(LoaderContext);
 
@@ -102,7 +102,7 @@ export const HomeDisplay = ({
       translateY: "0%",
       opacity: 1,
       height:
-        mini && item.href != ""
+        mini && orientation == "landscape" && item.href != ""
           ? "100%"
           : custom.position == "start"
           ? "80%"
@@ -130,11 +130,13 @@ export const HomeDisplay = ({
         itemHandler({ index: -1, name: "", desc: "", href: "" });
       }
     };
-    window.addEventListener("keydown", handleKeydown);
+    if (loaded) {
+      window.addEventListener("keydown", handleKeydown);
+    }
     return () => {
       window.removeEventListener("keydown", handleKeydown);
     };
-  }, []);
+  }, [loaded]);
 
   useEffect(() => {
     if (animationState == "complete") {
@@ -152,12 +154,21 @@ export const HomeDisplay = ({
         y: "-10%",
       }}
     >
-      <div className="relative max-sm:flex-2 landscape:flex-1 flex flex-col landscape:flex-row gap-12 hsm:sm:col-span-4 hsm:lg:col-span-3 hsm:3xl:col-span-2">
+      <div className="relative max-sm:flex-2 landscape:flex-1 flex flex-col landscape:flex-row gap-12 hsm:sm:col-span-4 hsm:lg:col-span-3 hsm:3xl:col-span-2 max-sm:max-hsm:portrait:pt-4">
         <motion.div className="flex-1 relative w-full hsm:sm:fixed">
           <motion.div
             variants={{
               preload: { opacity: 0 },
-              active: { opacity: 1, transition: { delay: 0.3 } },
+              active: {
+                opacity: 0,
+              },
+              complete: {
+                opacity: 1,
+                transition: {
+                  delay: 0.2,
+                  ease: circOut,
+                },
+              },
             }}
             className="w-full portrait:max-w-[30rem] portrait:mx-auto"
           >
@@ -171,7 +182,7 @@ export const HomeDisplay = ({
         </motion.div>
         <motion.div
           // layoutRoot
-          className="relative flex flex-col justify-center items-center landscape:items-end landscape:justify-start sm:hsm:items-start sm:hsm:justify-center bg-red-500 grow overflow-hidden container-size"
+          className="flex flex-col justify-center items-center landscape:items-end landscape:justify-start sm:hsm:items-start sm:hsm:justify-center grow overflow-hidden container-size bg-red-500/10"
           variants={{
             preload: {
               position: "absolute",
@@ -181,11 +192,14 @@ export const HomeDisplay = ({
 
             complete: {
               position: "absolute",
+              top: mini && orientation == "portrait" ? "4rem" : "auto",
+              // mini && orientation == "landscape" ? "absolute" : "relative",
               width: "100%",
               height: "100%",
               transition: {
                 delay: 0.2,
                 ease: circOut,
+                // when: "afterChildren",
               },
             },
           }}
@@ -196,7 +210,7 @@ export const HomeDisplay = ({
             className={clsx(
               "p-0.5 ",
               "contained-portrait:w-full contained-portrait:h-auto contained-landscape:w-auto overflow-hidden",
-              mini && item.name !== ""
+              mini && orientation == "landscape" && item.name !== ""
                 ? "contained-landscape:h-1/5 aspect-5/1"
                 : "contained-landscape:h-full aspect-square",
               "max-w-[30rem] hsm:max-w-none hsm:sm:max-w-col-4 hsm:lg:max-w-col-3 hsm:3xl:max-w-col-2",
@@ -218,11 +232,14 @@ export const HomeDisplay = ({
               complete: {
                 background: "var(--foreground)",
                 position: "absolute",
-                top: "50%",
-                left: "50%",
-                translate: "-50% -50%",
+                top: mini ? "0%" : "50%",
+                left: mini ? "auto" : "50%",
+
+                translate: mini ? "0% 0%" : "-50% -50%",
                 scale: 1,
-                // transition: { duration: 2, ease: easeInOut },
+                transition: {},
+
+                // transition: { duration: 2, when: "beforeChildren" },
               },
             }}
             layout
