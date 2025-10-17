@@ -108,7 +108,7 @@ export const HomeDisplay = ({
           ? "80%"
           : "60%",
     }),
-    completed: (custom: { index: number; position: string }) => ({
+    complete: (custom: { index: number; position: string }) => ({
       translateY: "0%",
       opacity: 1,
       height:
@@ -139,8 +139,11 @@ export const HomeDisplay = ({
   }, [loaded]);
 
   useEffect(() => {
+    console.log("animationState", animationState);
     if (animationState == "complete") {
-      setAnimated(true);
+      setTimeout(() => {
+        setAnimated(true);
+      }, 500);
     }
   }, [animationState]);
 
@@ -219,31 +222,43 @@ export const HomeDisplay = ({
             variants={{
               preload: {
                 background: "var(--background)",
-                position: "fixed",
+                position: "absolute",
                 top: "50%",
-                left: "50%",
-                translate: "-50% -50%",
+                right: "50%",
+                translate: "50% -50%",
                 scale: 0.5,
               },
               active: {
                 background: "var(--foreground)",
                 scale: 1,
+                position: "absolute",
+                top: mini ? "0%" : "50%",
+                right: mini ? "0%" : "50%",
+                translate: mini ? "0% 0%" : "50% -50%",
               },
               complete: {
                 background: "var(--foreground)",
                 position: "absolute",
                 top: mini ? "0%" : "50%",
-                left: mini ? "auto" : "50%",
+                right: mini ? "0%" : "50%",
 
-                translate: mini ? "0% 0%" : "-50% -50%",
+                translate: mini ? "0% 0%" : "50% -50%",
                 scale: 1,
                 transition: {},
-
-                // transition: { duration: 2, when: "beforeChildren" },
               },
             }}
             layout
             key="test2"
+            onMouseLeave={() => {
+              if (animated && !mini)
+                itemHandler({
+                  index: -1,
+                  name: "",
+                  desc: "",
+                  href: "",
+                });
+            }}
+
             // layoutId="display"
             // key="display"
           >
@@ -341,6 +356,14 @@ export const HomeDisplay = ({
                       }
                       if (animationState == "active" && i == data.length - 1) {
                         setAnimationState("complete");
+                        // console.log(animationStateGroup);
+                        setAnimationStateGroup((prev) =>
+                          Array.from({ length: prev.length }, () => "complete")
+                        );
+                      }
+                      if (animationState == "complete") {
+                        console.log(animationStateGroup);
+                        console.log("complete animation for item", i);
                       }
                     }}
                   >
@@ -376,10 +399,10 @@ export const HomeDisplay = ({
         </motion.div>
         <Link
           href={item.href}
-          className="block w-full hsm:sm:w-full h-24 hsm:sm:h-full pointer-events-auto"
+          className="block w-full hsm:sm:w-full h-24 hsm:sm:h-full"
         >
           <motion.span
-            className="block bg-warm-red size-full"
+            className="block bg-warm-red size-full pointer-events-auto"
             variants={{
               preload: { clipPath: "inset(100% 0% 0% 0%)" },
               complete:
