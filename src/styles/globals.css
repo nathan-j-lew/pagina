@@ -50,6 +50,10 @@
 /* @custom-variant hxs (@media(min-height: 30rem)); */
 @custom-variant hsm (@media(min-height: 40rem));
 @custom-variant max-hsm (@media(max-height: 40rem));
+@custom-variant hmd (@media(min-height: 40rem) and (min-aspect-ratio: 4/3));
+@custom-variant hlg (@media(min-height: 40rem) and (min-aspect-ratio: 3/2));
+@custom-variant hxl (@media(min-height: 40rem) and (min-aspect-ratio: 5/3));
+@custom-variant h2xl (@media(min-height: 40rem) and (min-aspect-ratio: 16/9));
 /* @custom-variant hmd (@media(min-height: 48rem)); */
 @custom-variant ratio-square (@media(max-aspect-ratio: 1/1));
 @custom-variant ratio-test (@media(min-aspect-ratio: 2/1));

@@ -157,7 +157,7 @@ export const HomeDisplay = ({
         y: "-10%",
       }}
     >
-      <div className="relative max-sm:flex-2 landscape:flex-1 flex flex-col landscape:flex-row gap-12 hsm:sm:col-span-4 hsm:lg:col-span-3 hsm:3xl:col-span-2 max-sm:max-hsm:portrait:pt-4">
+      <div className="relative max-sm:flex-2 landscape:flex-1 flex flex-col landscape:flex-row gap-12 hsm:col-span-4 hmd:col-span-3 hxl:col-span-2 max-sm:max-hsm:portrait:pt-4">
         <motion.div className="flex-1 relative w-full hsm:sm:fixed">
           <motion.div
             variants={{
@@ -232,9 +232,9 @@ export const HomeDisplay = ({
                 background: "var(--foreground)",
                 scale: 1,
                 position: "absolute",
-                top: mini ? "0%" : "50%",
-                right: mini ? "0%" : "50%",
-                translate: mini ? "0% 0%" : "50% -50%",
+                top: "50%",
+                right: "50%",
+                translate: "50% -50%",
               },
               complete: {
                 background: "var(--foreground)",
@@ -388,7 +388,7 @@ export const HomeDisplay = ({
                   }
                 : { opacity: 0 },
           }}
-          className="w-full max-w-[30rem] mx-auto hsm:sm:landscape:hidden"
+          className="w-full max-w-[30rem] mx-auto hsm:sm:hidden"
         >
           <Link href={item.href} className="pointer-events-none h-15 block">
             <hgroup className="flex flex-col items-start">

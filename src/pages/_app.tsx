@@ -22,7 +22,7 @@ export default function App({ Component, pageProps }: AppProps) {
   const [resize, setResize] = useState<ResizeInfo>({
     size: { width: 0, height: 0 },
     orientation: "landscape",
-    mini: false,
+    mini: true,
   });
 
   const [loaded, setLoaded] = useState(false);
@@ -55,10 +55,18 @@ export default function App({ Component, pageProps }: AppProps) {
           window.innerWidth > window.innerHeight ? "landscape" : "portrait",
         mini: window.innerHeight < 640,
       });
-      setLoaded(true);
-      // console.log(lenis);
+      // setLoaded(true);
+      console.log("resize updated", resize);
     }
   };
+
+  const updateSizeWithLoad = () => {
+    updateSize();
+    setLoaded(true);
+  };
+  useEffect(() => {
+    updateSize();
+  }, []);
 
   useEffect(() => {
     const updateMousePosition = (e: MouseEvent) => {
@@ -72,10 +80,9 @@ export default function App({ Component, pageProps }: AppProps) {
     };
 
     if (loaded) {
-      updateSize();
       window.addEventListener("mousemove", updateMousePosition);
       window.addEventListener("touchmove", updateTaps);
-      window.addEventListener("resize", updateSize);
+      window.addEventListener("resize", updateSizeWithLoad);
     }
     return () => {
       if (loaded) {

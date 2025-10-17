@@ -65,9 +65,16 @@ export default function Home({ data }: { data: SpreadData[] }) {
   });
 
   const { loaded } = useContext(LoaderContext);
+  const { mini, orientation } = useContext(ResizeContext);
 
   return (
     <Fragment>
+      <div
+        className="fixed top-4 left-4 size-12 rounded-full z-100"
+        style={{
+          background: mini ? "red" : "blue",
+        }}
+      />
       <motion.main className="h-svh items-center relative max-sm:max-h-svh flex flex-col max-sm:portrait:flex-row w-max">
         <motion.section
           className="fixed left-0 top-0 w-full h-svh flex flex-col overflow-auto "

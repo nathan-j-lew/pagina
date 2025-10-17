@@ -9,5 +9,5 @@ export interface ResizeInfo {
 export const ResizeContext = createContext<ResizeInfo>({
   size: { width: 0, height: 0 },
   orientation: "landscape",
-  mini: false,
+  mini: true,
 });
