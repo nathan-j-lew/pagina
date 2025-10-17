@@ -61,7 +61,7 @@ export const HomeDisplay = ({
   const router = useRouter();
   const { size, orientation, mini } = useContext(ResizeContext);
 
-  const { setLoaded } = useContext(LoaderContext);
+  const [animated, setAnimated] = useState<boolean>(false);
 
   const bars: Variants = {
     preload: {
@@ -241,7 +241,7 @@ export const HomeDisplay = ({
             layout
             key="test2"
             onMouseLeave={() => {
-              if (animationState == "complete" && !mini)
+              if (animated && !mini)
                 itemHandler({
                   index: -1,
                   name: "",
@@ -294,7 +294,7 @@ export const HomeDisplay = ({
                       // mini: mini && item.name !== "",
                     }}
                     onMouseEnter={() => {
-                      if (animationState == "complete" && !mini)
+                      if (animated && !mini)
                         itemHandler({
                           index: i,
                           name: spread.title,
@@ -308,7 +308,7 @@ export const HomeDisplay = ({
                       if (!mini) {
                         router.push(`/${spread.slug}`);
                       } else {
-                        if (animationState == "complete") {
+                        if (animated) {
                           itemHandler({
                             index: i,
                             name: spread.title,
@@ -347,7 +347,11 @@ export const HomeDisplay = ({
                           Array.from({ length: prev.length }, () => "complete")
                         );
                       }
-                      if (animationState == "complete") {
+                      if (
+                        animationState == "complete" &&
+                        i == data.length - 1
+                      ) {
+                        setAnimated(true);
                       }
                     }}
                   >
