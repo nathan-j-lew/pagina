@@ -210,7 +210,7 @@ export const HomeDisplay = ({
               "p-0.5 ",
               "contained-portrait:w-full contained-portrait:h-auto contained-landscape:w-auto overflow-hidden",
               mini && orientation == "landscape" && item.name !== ""
-                ? "contained-landscape:h-full aspect-5/1 contained-landscape:max-h-[6rem]"
+                ? "contained-landscape:h-full aspect-5/1 contained-landscape:max-h-[min(6rem,20%)]"
                 : "contained-landscape:h-full aspect-square",
               "max-w-[30rem] hsm:max-w-col-4 hmd:max-w-col-3 hxl:max-w-col-2",
               "max-h-[30rem] hsm:max-h-col-4 hmd:max-h-col-3 hxl:max-h-col-2"
