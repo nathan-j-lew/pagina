@@ -30,15 +30,18 @@ import { LoaderContext } from "@/context/Loader/LoaderContext";
 import { ResizeContext } from "@/context/Resize/ResizeContext";
 import { delay } from "motion";
 import { useLenis } from "lenis/react";
+import { LoadState } from "@/context/Loader/LoaderContext";
 
 export const HomeDisplay = ({
   data,
-  loaded,
+  animationState,
+  animationHandler,
   item,
   itemHandler,
 }: {
   data: SpreadData[];
-  loaded: boolean;
+  animationState: LoadState;
+  animationHandler: (state: LoadState) => void;
   item: {
     index: number;
     name: string;
@@ -52,15 +55,9 @@ export const HomeDisplay = ({
     href: string;
   }) => void;
 }) => {
-  type STATES = "loadIn" | "idle" | "preactive" | "active" | "complete";
-  const [animationStateGroup, setAnimationStateGroup] = useState<STATES[]>(
-    data.map(() => (loaded ? "active" : "loadIn"))
+  const [animationStateGroup, setAnimationStateGroup] = useState<LoadState[]>(
+    data.map(() => (animationState == "complete" ? "complete" : "loadIn"))
   );
-  const [animationState, setAnimationState] = useState<STATES>(
-    loaded ? "active" : "loadIn"
-  );
-
-  const [animated, setAnimated] = useState(loaded);
   const router = useRouter();
   const { size, orientation, mini } = useContext(ResizeContext);
 
@@ -121,8 +118,11 @@ export const HomeDisplay = ({
   };
 
   useEffect(() => {
-    if (animated) setTimeout(() => setLoaded(true), 1000);
-  }, [animated]);
+    console.log("animationState changed", animationState);
+    if (animationState == "preactive") {
+      setAnimationStateGroup((prev) => prev.map(() => "preactive"));
+    }
+  }, [animationState]);
 
   useEffect(() => {
     const handleKeydown = (e: KeyboardEvent) => {
@@ -130,21 +130,12 @@ export const HomeDisplay = ({
         itemHandler({ index: -1, name: "", desc: "", href: "" });
       }
     };
-    if (loaded) {
+    if (animationState == "complete") {
       window.addEventListener("keydown", handleKeydown);
     }
     return () => {
       window.removeEventListener("keydown", handleKeydown);
     };
-  }, [loaded]);
-
-  useEffect(() => {
-    console.log("animationState", animationState);
-    if (animationState == "complete") {
-      setTimeout(() => {
-        setAnimated(true);
-      }, 500);
-    }
   }, [animationState]);
 
   return (
@@ -250,7 +241,7 @@ export const HomeDisplay = ({
             layout
             key="test2"
             onMouseLeave={() => {
-              if (animated && !mini)
+              if (animationState == "complete" && !mini)
                 itemHandler({
                   index: -1,
                   name: "",
@@ -303,7 +294,7 @@ export const HomeDisplay = ({
                       // mini: mini && item.name !== "",
                     }}
                     onMouseEnter={() => {
-                      if (animated)
+                      if (animationState == "complete" && !mini)
                         itemHandler({
                           index: i,
                           name: spread.title,
@@ -314,10 +305,10 @@ export const HomeDisplay = ({
                     href={`/${spread.slug}`}
                     onClick={(e) => {
                       e.preventDefault();
-                      if (size.width >= 960 && !mini) {
+                      if (!mini) {
                         router.push(`/${spread.slug}`);
                       } else {
-                        if (animated) {
+                        if (animationState == "complete") {
                           itemHandler({
                             index: i,
                             name: spread.title,
@@ -339,31 +330,24 @@ export const HomeDisplay = ({
                           newState[i] = "idle";
                           return newState;
                         });
-                        if (i == data.length - 1) {
-                          setTimeout(() => {
-                            setAnimationState("preactive");
-                            setAnimationStateGroup(data.map(() => "preactive"));
-                          }, 2000);
-                        }
                       }
-                      if (animationStateGroup[i] == "preactive") {
-                        setAnimationState("active");
-                        setAnimationStateGroup((prev) => {
-                          const newState = [...prev];
-                          newState[i] = "active";
-                          return newState;
-                        });
+                      if (
+                        animationStateGroup[i] == "preactive" &&
+                        i == data.length - 1
+                      ) {
+                        // ÷÷
+                        animationHandler("active");
+                        setAnimationStateGroup((prev) =>
+                          prev.map(() => "active")
+                        );
                       }
                       if (animationState == "active" && i == data.length - 1) {
-                        setAnimationState("complete");
-                        // console.log(animationStateGroup);
+                        animationHandler("complete");
                         setAnimationStateGroup((prev) =>
                           Array.from({ length: prev.length }, () => "complete")
                         );
                       }
                       if (animationState == "complete") {
-                        console.log(animationStateGroup);
-                        console.log("complete animation for item", i);
                       }
                     }}
                   >
@@ -381,7 +365,7 @@ export const HomeDisplay = ({
           variants={{
             preload: { opacity: 0 },
             complete:
-              animated && item.name !== ""
+              item.name !== ""
                 ? {
                     opacity: 1,
                     transition: { ease: "easeOut" },
@@ -406,7 +390,7 @@ export const HomeDisplay = ({
             variants={{
               preload: { clipPath: "inset(100% 0% 0% 0%)" },
               complete:
-                animated && item.name !== ""
+                item.name !== ""
                   ? {
                       clipPath: "inset(0% 0% 0% 0%)",
                       transition: { ease: circOut },

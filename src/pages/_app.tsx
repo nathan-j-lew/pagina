@@ -1,7 +1,7 @@
 import "@/styles/globals.css";
 import type { AppProps } from "next/app";
 import { MousePositionContext } from "@/context/MousePosition/MousePositionContext";
-import { LoaderContext } from "@/context/Loader/LoaderContext";
+import { LoaderContext, LoadState } from "@/context/Loader/LoaderContext";
 import { useState, useEffect, Fragment, useRef } from "react";
 import ReactLenis, { LenisRef, useLenis } from "lenis/react";
 import { Loader } from "@/components/loader/loader";
@@ -9,6 +9,8 @@ import localFont from "next/font/local";
 import { ScrollContext } from "@/context/Scroll/ScrollContext";
 import { ResizeContext, ResizeInfo } from "@/context/Resize/ResizeContext";
 import { AnimatePresence } from "motion/react";
+import { clear } from "console";
+import { pre } from "motion/react-client";
 
 const pizzi = localFont({
   src: [
@@ -25,7 +27,7 @@ export default function App({ Component, pageProps }: AppProps) {
     mini: true,
   });
 
-  const [loaded, setLoaded] = useState(false);
+  const [loaded, setLoaded] = useState<LoadState>("idle");
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [clicked, setClicked] = useState<{
     x: number | null;
@@ -62,36 +64,46 @@ export default function App({ Component, pageProps }: AppProps) {
 
   const updateSizeWithLoad = () => {
     updateSize();
-    setLoaded(true);
+    setLoaded("complete");
   };
+
+  const updateMousePosition = (e: MouseEvent) => {
+    setMousePosition({ x: e.clientX, y: e.clientY });
+  };
+  const updateTaps = (e: TouchEvent) => {
+    setTaps([
+      { x: e.touches[0].clientX, y: e.touches[0].clientY },
+      { x: e.touches[0].clientX, y: e.touches[0].clientY },
+    ]);
+  };
+
+  const addEventListeners = async () => {
+    window.addEventListener("mousemove", updateMousePosition);
+    window.addEventListener("touchmove", updateTaps);
+    window.addEventListener("resize", updateSize);
+  };
+
+  // const preactive = setTimeout(() => {
+  //   setLoaded("preactive");
+  // }, 2000);
+
   useEffect(() => {
     updateSize();
-  }, []);
 
-  useEffect(() => {
-    const updateMousePosition = (e: MouseEvent) => {
-      setMousePosition({ x: e.clientX, y: e.clientY });
-    };
-    const updateTaps = (e: TouchEvent) => {
-      setTaps([
-        { x: e.touches[0].clientX, y: e.touches[0].clientY },
-        { x: e.touches[0].clientX, y: e.touches[0].clientY },
-      ]);
-    };
-
-    if (loaded) {
-      window.addEventListener("mousemove", updateMousePosition);
-      window.addEventListener("touchmove", updateTaps);
-      window.addEventListener("resize", updateSizeWithLoad);
-    }
+    // preactive;
+    const preactive = setTimeout(() => {
+      setLoaded("preactive");
+    }, 2000);
+    addEventListeners().then(() => {
+      console.log("event listeners added");
+    });
     return () => {
-      if (loaded) {
-        window.removeEventListener("mousemove", updateMousePosition);
-        window.removeEventListener("touchmove", updateTaps);
-        window.removeEventListener("resize", updateSize);
-      }
+      window.removeEventListener("mousemove", updateMousePosition);
+      window.removeEventListener("touchmove", updateTaps);
+      window.removeEventListener("resize", updateSize);
+      clearTimeout(preactive);
     };
-  }, [loaded]);
+  }, []);
 
   const ref = useRef<LenisRef>(null);
 

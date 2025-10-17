@@ -64,7 +64,7 @@ export default function Home({ data }: { data: SpreadData[] }) {
     href: "",
   });
 
-  const { loaded } = useContext(LoaderContext);
+  const { loaded, setLoaded } = useContext(LoaderContext);
   const { mini, orientation } = useContext(ResizeContext);
 
   return (
@@ -87,7 +87,8 @@ export default function Home({ data }: { data: SpreadData[] }) {
             <AnimatePresence>
               <HomeDisplay
                 data={data}
-                loaded={loaded}
+                animationState={loaded}
+                animationHandler={setLoaded}
                 item={currentItem}
                 itemHandler={setCurrentItem}
               />
