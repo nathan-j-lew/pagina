@@ -9,8 +9,6 @@ import localFont from "next/font/local";
 import { ScrollContext } from "@/context/Scroll/ScrollContext";
 import { ResizeContext, ResizeInfo } from "@/context/Resize/ResizeContext";
 import { AnimatePresence } from "motion/react";
-import { clear } from "console";
-import { pre } from "motion/react-client";
 
 const pizzi = localFont({
   src: [
@@ -78,8 +76,8 @@ export default function App({ Component, pageProps }: AppProps) {
   };
 
   const addEventListeners = async () => {
-    window.addEventListener("mousemove", updateMousePosition);
-    window.addEventListener("touchmove", updateTaps);
+    // window.addEventListener("mousemove", updateMousePosition);
+    // window.addEventListener("touchmove", updateTaps);
     window.addEventListener("resize", updateSize);
   };
 
@@ -88,20 +86,17 @@ export default function App({ Component, pageProps }: AppProps) {
   // }, 2000);
 
   useEffect(() => {
-    updateSize();
-
-    // preactive;
-    const preactive = setTimeout(() => {
-      setLoaded("preactive");
-    }, 2000);
     addEventListeners().then(() => {
+      updateSize();
+      setTimeout(() => {
+        setLoaded("preactive");
+      }, 2000);
       console.log("event listeners added");
     });
     return () => {
-      window.removeEventListener("mousemove", updateMousePosition);
-      window.removeEventListener("touchmove", updateTaps);
+      // window.removeEventListener("mousemove", updateMousePosition);
+      // window.removeEventListener("touchmove", updateTaps);
       window.removeEventListener("resize", updateSize);
-      clearTimeout(preactive);
     };
   }, []);
 

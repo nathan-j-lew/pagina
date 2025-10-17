@@ -43,16 +43,6 @@ export default function Home({ data }: { data: SpreadData[] }) {
 
   const lenis = useLenis();
 
-  const [mode, setMode] = useState<"grid" | "list">("grid");
-
-  const setModeGrid = () => {
-    setMode("grid");
-  };
-
-  const setModeList = () => {
-    setMode("list");
-  };
-
   const { scrollXProgress, scrollYProgress } = useScroll({
     container: scrollRef,
   });
@@ -65,7 +55,16 @@ export default function Home({ data }: { data: SpreadData[] }) {
   });
 
   const { loaded, setLoaded } = useContext(LoaderContext);
-  const { mini, orientation } = useContext(ResizeContext);
+  const { mini, orientation, size } = useContext(ResizeContext);
+
+  useEffect(() => {
+    setCurrentItem({
+      index: -1,
+      name: "",
+      desc: "",
+      href: "",
+    });
+  }, [mini]);
 
   return (
     <Fragment>

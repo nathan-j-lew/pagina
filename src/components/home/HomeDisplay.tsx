@@ -109,7 +109,7 @@ export const HomeDisplay = ({
       translateY: "0%",
       opacity: 1,
       height:
-        mini && item.href != ""
+        mini && orientation == "landscape" && item.href != ""
           ? "100%"
           : custom.position == "start"
           ? "80%"
@@ -199,16 +199,21 @@ export const HomeDisplay = ({
           }}
           layout
           key="test1"
+          onAnimationComplete={() => {
+            if (animationState == "complete") {
+              setAnimated(true);
+            }
+          }}
         >
           <motion.div
             className={clsx(
               "p-0.5 ",
               "contained-portrait:w-full contained-portrait:h-auto contained-landscape:w-auto overflow-hidden",
               mini && orientation == "landscape" && item.name !== ""
-                ? "contained-landscape:h-1/5 aspect-5/1"
+                ? "contained-landscape:h-full aspect-5/1 contained-landscape:max-h-[6rem]"
                 : "contained-landscape:h-full aspect-square",
-              "max-w-[30rem] hsm:max-w-none hsm:sm:max-w-col-4 hsm:lg:max-w-col-3 hsm:3xl:max-w-col-2",
-              "max-h-[30rem] hsm:max-h-none hsm:sm:max-h-col-4 hsm:lg:max-h-col-3 hsm:3xl:max-h-col-2"
+              "max-w-[30rem] hsm:max-w-col-4 hmd:max-w-col-3 hxl:max-w-col-2",
+              "max-h-[30rem] hsm:max-h-col-4 hmd:max-h-col-3 hxl:max-h-col-2"
             )}
             variants={{
               preload: {
@@ -346,12 +351,6 @@ export const HomeDisplay = ({
                         setAnimationStateGroup((prev) =>
                           Array.from({ length: prev.length }, () => "complete")
                         );
-                      }
-                      if (
-                        animationState == "complete" &&
-                        i == data.length - 1
-                      ) {
-                        setAnimated(true);
                       }
                     }}
                   >
