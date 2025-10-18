@@ -9,6 +9,7 @@ import localFont from "next/font/local";
 import { ScrollContext } from "@/context/Scroll/ScrollContext";
 import { ResizeContext, ResizeInfo } from "@/context/Resize/ResizeContext";
 import { AnimatePresence } from "motion/react";
+import { PointerContext, PointerInfo } from "@/context/Pointer/PointerContext";
 
 const pizzi = localFont({
   src: [
@@ -23,6 +24,11 @@ export default function App({ Component, pageProps }: AppProps) {
     size: { width: 0, height: 0 },
     orientation: "landscape",
     mini: -1,
+  });
+
+  const [pointer, setPointer] = useState<PointerInfo>({
+    fine: false,
+    coarse: false,
   });
 
   const [loaded, setLoaded] = useState<LoadState>("idle");
@@ -54,6 +60,10 @@ export default function App({ Component, pageProps }: AppProps) {
         orientation:
           window.innerWidth > window.innerHeight ? "landscape" : "portrait",
         mini: window.innerHeight < 640 ? 1 : 0,
+      });
+      setPointer({
+        fine: window.matchMedia("(pointer: fine)").matches,
+        coarse: window.matchMedia("(pointer: coarse)").matches,
       });
       // setLoaded(true);
       console.log("resize updated", resize);
@@ -115,43 +125,49 @@ export default function App({ Component, pageProps }: AppProps) {
           mini: resize.mini,
         }}
       >
-        {/* <div className="fixed z-100 top-0 right-0 portrait:bg-red-500 bg-green-500">
-          <div>
-            {resize.size.width > resize.size.height ? "Landscape" : "Portrait"}
-          </div>
-          <div>{resize.orientation}</div>
-        </div> */}
-        <ScrollContext value={ref}>
-          <ReactLenis
-            options={{
-              syncTouch: true,
-              gestureOrientation:
-                resize.size.width > resize.size.height ||
-                resize.size.width > 640
-                  ? "vertical"
-                  : "horizontal",
-              orientation:
-                resize.size.width > resize.size.height ||
-                resize.size.width > 640
-                  ? "vertical"
-                  : "horizontal",
-            }}
-            className="w-screen min-h-svh overflow-x-auto overflow-y-hidden hsm:sm:overflow-y-auto hsm:sm:overflow-x-hidden"
-            ref={ref}
-          >
-            <MousePositionContext
-              value={{ position: mousePosition, clicked: clicked, taps: taps }}
+        <PointerContext value={{ fine: pointer.fine, coarse: pointer.coarse }}>
+          {/* <div className="fixed z-100 top-0 right-0 portrait:bg-red-500 bg-green-500">
+            <div>
+              {resize.size.width > resize.size.height ? "Landscape" : "Portrait"}
+            </div>
+            <div>{resize.orientation}</div>
+          </div> */}
+          <ScrollContext value={ref}>
+            <ReactLenis
+              options={{
+                syncTouch: true,
+                gestureOrientation:
+                  resize.size.width > resize.size.height ||
+                  resize.size.width > 640
+                    ? "vertical"
+                    : "horizontal",
+                orientation:
+                  resize.size.width > resize.size.height ||
+                  resize.size.width > 640
+                    ? "vertical"
+                    : "horizontal",
+              }}
+              className="w-screen min-h-svh overflow-x-auto overflow-y-hidden hsm:sm:overflow-y-auto hsm:sm:overflow-x-hidden"
+              ref={ref}
             >
-              <LoaderContext value={{ loaded: loaded, setLoaded: setLoaded }}>
-                <div
-                  className={`${pizzi.variable} font-sans scrollbar-gutter-stable`}
-                >
-                  <Component {...pageProps} />
-                </div>
-              </LoaderContext>
-            </MousePositionContext>
-          </ReactLenis>
-        </ScrollContext>
+              <MousePositionContext
+                value={{
+                  position: mousePosition,
+                  clicked: clicked,
+                  taps: taps,
+                }}
+              >
+                <LoaderContext value={{ loaded: loaded, setLoaded: setLoaded }}>
+                  <div
+                    className={`${pizzi.variable} font-sans scrollbar-gutter-stable`}
+                  >
+                    <Component {...pageProps} />
+                  </div>
+                </LoaderContext>
+              </MousePositionContext>
+            </ReactLenis>
+          </ScrollContext>
+        </PointerContext>
       </ResizeContext>
     </Fragment>
   );

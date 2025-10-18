@@ -31,6 +31,7 @@ import { ResizeContext } from "@/context/Resize/ResizeContext";
 import { delay } from "motion";
 import { useLenis } from "lenis/react";
 import { LoadState } from "@/context/Loader/LoaderContext";
+import { PointerContext } from "@/context/Pointer/PointerContext";
 
 export const HomeDisplay = ({
   data,
@@ -60,6 +61,7 @@ export const HomeDisplay = ({
   );
   const router = useRouter();
   const { size, orientation, mini } = useContext(ResizeContext);
+  const { fine, coarse } = useContext(PointerContext);
 
   const [animated, setAnimated] = useState<boolean>(false);
 
@@ -137,6 +139,11 @@ export const HomeDisplay = ({
       window.removeEventListener("keydown", handleKeydown);
     };
   }, [animationState]);
+
+  useEffect(() => {
+    console.log("coarse:", coarse);
+    console.log("fine:", fine);
+  }, [size]);
 
   return (
     <motion.div
@@ -329,7 +336,7 @@ export const HomeDisplay = ({
                     href={`/${spread.slug}`}
                     onClick={(e) => {
                       e.preventDefault();
-                      if (mini == 0 && size.width > 640) {
+                      if (fine) {
                         router.push(`/${spread.slug}`);
                       } else {
                         if (animated) {
