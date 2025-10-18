@@ -69,9 +69,17 @@ export default function Home({ data }: { data: SpreadData[] }) {
   return (
     <Fragment>
       <div
-        className="fixed top-4 left-4 size-12 rounded-full z-100"
+        className="fixed top-4 left-4 size-6 rounded-full z-100 bg-warm-red"
         style={{
-          background: mini ? "red" : "blue",
+          scale: mini == 1 ? 0.5 : 1,
+        }}
+      />
+
+      <div
+        className="fixed top-4 left-12 size-12 rounded-full z-100 bg-warm-red"
+        style={{
+          width: orientation === "landscape" ? "3rem" : "1.5rem",
+          height: orientation === "landscape" ? "1.5rem" : "3rem",
         }}
       />
       <motion.main className="h-svh items-center relative max-sm:max-h-svh flex flex-col max-sm:portrait:flex-row w-max">
@@ -84,13 +92,15 @@ export default function Home({ data }: { data: SpreadData[] }) {
             style={{ "--paddingLocal": "1rem" } as React.CSSProperties}
           >
             <AnimatePresence>
-              <HomeDisplay
-                data={data}
-                animationState={loaded}
-                animationHandler={setLoaded}
-                item={currentItem}
-                itemHandler={setCurrentItem}
-              />
+              {mini !== -1 && (
+                <HomeDisplay
+                  data={data}
+                  animationState={loaded}
+                  animationHandler={setLoaded}
+                  item={currentItem}
+                  itemHandler={setCurrentItem}
+                />
+              )}
             </AnimatePresence>
           </div>
         </motion.section>

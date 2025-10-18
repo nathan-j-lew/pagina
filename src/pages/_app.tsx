@@ -22,7 +22,7 @@ export default function App({ Component, pageProps }: AppProps) {
   const [resize, setResize] = useState<ResizeInfo>({
     size: { width: 0, height: 0 },
     orientation: "landscape",
-    mini: true,
+    mini: -1,
   });
 
   const [loaded, setLoaded] = useState<LoadState>("idle");
@@ -53,7 +53,7 @@ export default function App({ Component, pageProps }: AppProps) {
         size: { width: window.innerWidth, height: window.innerHeight },
         orientation:
           window.innerWidth > window.innerHeight ? "landscape" : "portrait",
-        mini: window.innerHeight < 640,
+        mini: window.innerHeight < 640 ? 1 : 0,
       });
       // setLoaded(true);
       console.log("resize updated", resize);

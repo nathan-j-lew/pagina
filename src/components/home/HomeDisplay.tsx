@@ -99,7 +99,7 @@ export const HomeDisplay = ({
       translateY: "0%",
       opacity: 1,
       height:
-        mini && orientation == "landscape" && item.href != ""
+        mini !== -1 && orientation == "landscape" && item.href != ""
           ? "100%"
           : custom.position == "start"
           ? "80%"
@@ -109,7 +109,7 @@ export const HomeDisplay = ({
       translateY: "0%",
       opacity: 1,
       height:
-        mini && orientation == "landscape" && item.href != ""
+        mini !== -1 && orientation == "landscape" && item.href != ""
           ? "100%"
           : custom.position == "start"
           ? "80%"
@@ -148,7 +148,7 @@ export const HomeDisplay = ({
         y: "-10%",
       }}
     >
-      <div className="relative max-sm:flex-2 landscape:flex-1 flex flex-col landscape:flex-row gap-12 hsm:col-span-4 hmd:col-span-3 hxl:col-span-2 max-sm:max-hsm:portrait:pt-4">
+      <div className="relative max-sm:flex-2 landscape:flex-1 flex flex-col landscape:flex-row gap-12 hsm:col-span-4 hmd:col-span-3 hxl:col-span-2  min-h-[216px]">
         <motion.div className="flex-1 relative w-full hsm:sm:fixed">
           <motion.div
             variants={{
@@ -176,18 +176,20 @@ export const HomeDisplay = ({
         </motion.div>
         <motion.div
           // layoutRoot
-          className="flex flex-col justify-center items-center landscape:items-end landscape:justify-start sm:hsm:items-start sm:hsm:justify-center grow overflow-hidden container-size bg-red-500/10"
+          className="flex flex-col justify-center items-center landscape:items-end landscape:justify-start sm:hsm:items-start sm:hsm:justify-center grow container-size portrait:max-hsm:min-h-[216px]"
           variants={{
             preload: {
               position: "absolute",
-              width: "100vw",
-              height: "100vh",
+              width:
+                mini !== -1 && orientation == "portrait" ? "100%" : "100vw",
+              height:
+                mini !== -1 && orientation == "portrait" ? "100%" : "100vh",
             },
 
             complete: {
               position: "absolute",
-              top: mini && orientation == "portrait" ? "4rem" : "auto",
-              // mini && orientation == "landscape" ? "absolute" : "relative",
+              // top: mini !== -1 && orientation == "portrait" ? "4rem" : "auto",
+              // mini !== -1 && orientation == "landscape" ? "absolute" : "relative",
               width: "100%",
               height: "100%",
               transition: {
@@ -207,13 +209,13 @@ export const HomeDisplay = ({
         >
           <motion.div
             className={clsx(
-              "p-0.5 ",
-              "contained-portrait:w-full contained-portrait:h-auto contained-landscape:w-auto overflow-hidden",
-              mini && orientation == "landscape" && item.name !== ""
+              "p-0.5",
+              "contained-portrait:w-full contained-portrait:h-auto contained-landscape:w-auto portrait:max-hsm:min-w-[216px] portrait:max-hsm:min-h-[216px]",
+              mini !== -1 && orientation == "landscape" && item.name !== ""
                 ? "contained-landscape:h-full aspect-5/1 contained-landscape:max-h-[min(6rem,20%)]"
                 : "contained-landscape:h-full aspect-square",
-              "max-w-[30rem] hsm:max-w-col-4 hmd:max-w-col-3 hxl:max-w-col-2",
-              "max-h-[30rem] hsm:max-h-col-4 hmd:max-h-col-3 hxl:max-h-col-2"
+              "max-w-[30rem] hsm:sm:max-w-col-4 hmd:max-w-col-3 hxl:max-w-col-2",
+              "max-h-[30rem] hsm:sm:max-h-col-4 hmd:max-h-col-3 hxl:max-h-col-2"
             )}
             variants={{
               preload: {
@@ -235,10 +237,26 @@ export const HomeDisplay = ({
               complete: {
                 background: "var(--foreground)",
                 position: "absolute",
-                top: mini ? "0%" : "50%",
-                right: mini ? "0%" : "50%",
+                top: mini
+                  ? orientation == "landscape"
+                    ? "0%"
+                    : "calc(3rem)"
+                  : orientation == "landscape"
+                  ? "50%"
+                  : "calc(4.5rem)",
+                right: mini
+                  ? orientation == "landscape"
+                    ? "0%"
+                    : "50%"
+                  : "50%",
 
-                translate: mini ? "0% 0%" : "50% -50%",
+                translate: mini
+                  ? orientation == "landscape"
+                    ? "0% 0%"
+                    : "50% 0%"
+                  : orientation == "landscape"
+                  ? "50% -50%"
+                  : "50% 0%",
                 scale: 1,
                 transition: {},
               },
@@ -246,7 +264,7 @@ export const HomeDisplay = ({
             layout
             key="test2"
             onMouseLeave={() => {
-              if (animated && !mini)
+              if (animated && mini == 0 && size.width > 640)
                 itemHandler({
                   index: -1,
                   name: "",
@@ -296,7 +314,7 @@ export const HomeDisplay = ({
                     custom={{
                       index: i,
                       position: spread.position,
-                      // mini: mini && item.name !== "",
+                      // mini: mini !== -1 && item.name !== "",
                     }}
                     onMouseEnter={() => {
                       if (animated && !mini)
@@ -310,7 +328,7 @@ export const HomeDisplay = ({
                     href={`/${spread.slug}`}
                     onClick={(e) => {
                       e.preventDefault();
-                      if (!mini) {
+                      if (mini == 0 && size.width > 640) {
                         router.push(`/${spread.slug}`);
                       } else {
                         if (animated) {
