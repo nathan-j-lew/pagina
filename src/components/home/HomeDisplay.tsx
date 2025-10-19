@@ -190,10 +190,8 @@ export const HomeDisplay = ({
           variants={{
             preload: {
               position: "absolute",
-              width:
-                mini !== -1 && orientation == "portrait" ? "100%" : "100vw",
-              height:
-                mini !== -1 && orientation == "portrait" ? "100%" : "100vh",
+              width: "100vw",
+              height: "100vh",
             },
 
             complete: {
@@ -273,7 +271,7 @@ export const HomeDisplay = ({
             layout
             key="test2"
             onMouseLeave={() => {
-              if (animated && mini == 0 && size.width > 640)
+              if (animated && mini == 0 && size.width > 640 && fine)
                 itemHandler({
                   index: -1,
                   name: "",
@@ -325,7 +323,7 @@ export const HomeDisplay = ({
                       position: spread.position,
                     }}
                     onMouseEnter={() => {
-                      if (animated && !mini)
+                      if (animated && !mini && fine)
                         itemHandler({
                           index: i,
                           name: spread.title,
